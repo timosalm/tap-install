@@ -1,0 +1,7 @@
+generated/
+values.yaml
+
+### IntelliJ IDEA ###
+.idea
+### VS Code ###
+.vscode/

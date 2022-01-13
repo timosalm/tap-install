@@ -1,0 +1,18 @@
+#@ load("@ytt:overlay", "overlay")
+#@ load("@ytt:yaml", "yaml")
+#@ load("@ytt:data", "data")
+
+#@ def updates():
+cfk8s_controller_namespace: INGRESS_TLS_SECRET_NAMESPACE
+workloads_tls_secret_name: tas-adapter-INGRESS_TLS_SECRET_NAME
+#@overlay/match when=1
+cfProcessDefaults:
+  #@overlay/match when=1
+  memoryMB: DEFAULT_APP_MEMORY_ALLOCATION
+#@ end
+
+#@overlay/match by=overlay.subset({"metadata":{"name":"cf-k8s-controllers-config"}, "kind": "ConfigMap"})
+---
+data:
+  #@overlay/replace via=lambda a,_: yaml.encode(overlay.apply(yaml.decode(a), updates()))
+  cf_k8s_controllers_config.yaml:

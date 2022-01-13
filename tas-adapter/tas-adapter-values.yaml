@@ -1,0 +1,14 @@
+#@ load("@ytt:data", "data")
+---
+api_ingress:
+  fqdn: #@ "api-tas-adapter.{}".format(data.values.ingress.domain)
+  tls:
+    crt: "PLACEHOLDER"
+    key: "PLACEHOLDER"
+app_ingress:
+  default_domain:  #@ "tas-adapter.{}".format(data.values.ingress.domain)
+  tls:
+    crt: "PLACEHOLDER"
+    key: "PLACEHOLDER"
+kpack_image_tag_prefix: #@ "{}/tas-adapter-droplets".format(data.values.container_registry.hostname)
+package_registry_base_path: #@ "{}/tas-adapter-packages".format(data.values.container_registry.hostname)

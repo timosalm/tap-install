@@ -1,0 +1,9 @@
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.subset({"metadata":{"name":"cf-k8s-api-proxy"}, "kind": "HTTPProxy"})
+---
+spec:
+  virtualhost:
+    tls:
+      #@overlay/match missing_ok=True
+      secretName: INGRESS_TLS_SECRET_NAMESPACE/INGRESS_TLS_SECRET_NAME
