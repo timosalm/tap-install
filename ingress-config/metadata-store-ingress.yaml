@@ -1,0 +1,17 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: metadata-store-app
+  namespace: metadata-store
+spec:
+  routes:
+  - services:
+    - name: metadata-store-app
+      port: 8443
+      protocol: tls
+  virtualhost:
+    fqdn: #@ "metadata-store.{}".format(data.values.ingress.domain)
+    tls:
+      secretName: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)

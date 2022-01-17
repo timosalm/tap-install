@@ -1,7 +1,6 @@
 #!/bin/bash
 mkdir -p generated
 
-
 ytt --ignore-unknown-comments -f values.yaml -f additonal-ingress-config/ | kubectl apply -f-
 
 sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo

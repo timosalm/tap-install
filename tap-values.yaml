@@ -1,0 +1,70 @@
+#@ load("@ytt:data", "data")
+---
+profile: full
+ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+buildservice:
+  kp_default_repository: #@ "{}/tap/build-service".format(data.values.container_registry.hostname)
+  kp_default_repository_username: #@ data.values.container_registry.username
+  kp_default_repository_password: #@ data.values.container_registry.password
+  tanzunet_username: #@ data.values.tanzunet.username
+  tanzunet_password: #@ data.values.tanzunet.password
+  enable_automatic_dependency_updates: true
+  descriptor_name: full
+
+supply_chain: testing_scanning
+
+ootb_supply_chain_testing_scanning:
+  registry:
+    server: #@ data.values.container_registry.hostname
+    repository: "tap-wkld"
+  gitops:
+    ssh_secret: ""
+
+learningcenter:
+  ingressDomain: #@ "learning-center.{}".format(data.values.ingress.domain)
+  ingressSecret:
+    secretName: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
+tap_gui:
+  ingressEnabled: true
+  ingressDomain: #@ data.values.ingress.domain
+  service_type: ClusterIP # NodePort for distributions that don't support LoadBalancer
+  tls:
+    secretName: #@ data.values.ingress.contour_tls_secret                                                 
+    namespace: #@ data.values.ingress.contour_tls_namespace
+  app_config:
+    backend:
+      baseUrl: #@ "https://tap-gui.{}".format(data.values.ingress.domain)
+      cors:
+        origin: #@ "https://tap-gui.{}".format(data.values.ingress.domain)
+    app:
+      baseUrl: #@ "https://tap-gui.{}".format(data.values.ingress.domain)
+
+metadata_store:
+  app_service_type: ClusterIP # (optional) Defaults to LoadBalancer. Change to NodePort for distributions that don't support LoadBalancer
+
+contour:
+  envoy:
+    service:
+      annotations:      
+        external-dns.alpha.kubernetes.io/hostname: #@ "*.{}".format(data.values.ingress.domain)
+      type: LoadBalancer
+
+accelerator: 
+  domain: #@ "accelerator.{}".format(data.values.ingress.domain)                         
+  ingress:
+    include: true
+  tls:
+    secretName: #@ data.values.ingress.contour_tls_secret                                                 
+    namespace: #@ data.values.ingress.contour_tls_namespace
+  server:
+    service_type: ClusterIP
+
+cnrs:
+  domain_name: #@ "cnr.{}".format(data.values.ingress.domain)
+  domain_template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
+  default_tls_secret: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
+
+grype:
+  namespace: #@ data.values.developer_namespace
+  targetImagePullSecret: tap-registry 
+

@@ -1,0 +1,22 @@
+#@data/values
+---
+tanzunet:
+  username: user@example.com
+  password:
+ingress:
+  domain: example.com
+  contour_tls_namespace: tanzu-system-ingress
+  contour_tls_secret: contour-tls-delegation-cert
+container_registry:
+  hostname: harbor.example.com
+  username: admin
+  password: 
+developer_namespace: dev-space
+acme:
+  email: user@example.com
+aws:
+  region: eu-central-1
+  credentials:
+    accessKey: 
+    secretKey: 
+  zoneId:

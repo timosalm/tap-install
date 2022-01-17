@@ -1,0 +1,8 @@
+generated/
+values.yaml
+tanzu-cluster-essentials/
+tanzu/
+### IntelliJ IDEA ###
+.idea
+### VS Code ###
+.vscode/

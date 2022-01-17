@@ -1,0 +1,24 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: #@ "cnr-{}".format(data.values.ingress.contour_tls_secret)
+  namespace: #@ data.values.ingress.contour_tls_namespace
+spec:
+  commonName: #@ "*.cnr.{}".format(data.values.ingress.domain)
+  dnsNames:
+  - #@ "*.cnr.{}".format(data.values.ingress.domain)
+  duration: 2160h0m0s
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-contour-cluster-issuer
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  subject:
+    organizations:
+    - vmware
+  renewBefore: 360h0m0s
+  secretName: #@ "cnr-{}".format(data.values.ingress.contour_tls_secret)
