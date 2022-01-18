@@ -66,5 +66,5 @@ cnrs:
 
 grype:
   namespace: #@ data.values.developer_namespace
-  targetImagePullSecret: tap-registry 
+  targetImagePullSecret: registry-credentials
 
