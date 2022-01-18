@@ -21,9 +21,9 @@ ootb_supply_chain_testing_scanning:
     ssh_secret: ""
 
 learningcenter:
-  ingressDomain: #@ data.values.ingress.domain
+  ingressDomain: #@ "learning-center.{}".format(data.values.ingress.domain)
   ingressSecret:
-    secretName: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
+    secretName: #@ "learning-center-{}".format(data.values.ingress.contour_tls_secret)
 tap_gui:
   ingressEnabled: true
   ingressDomain: #@ data.values.ingress.domain
