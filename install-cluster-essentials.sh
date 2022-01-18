@@ -1,7 +1,5 @@
 #!/bin/bash
 
-docker login registry.tanzu.vmware.com
-
 pivnet download-product-files --product-slug='tanzu-cluster-essentials' --release-version='1.0.0' --product-file-id=1105818
 mkdir tanzu-cluster-essentials
 tar -xvf tanzu-cluster-essentials-linux-amd64-1.0.0.tgz -C tanzu-cluster-essentials
