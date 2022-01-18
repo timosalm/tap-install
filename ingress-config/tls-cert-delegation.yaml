@@ -13,3 +13,6 @@ spec:
     - secretName: #@ "cnr-{}".format(data.values.ingress.contour_tls_secret)
       targetNamespaces:
         - "*"
+    - secretName: #@ "learning-center-{}".format(data.values.ingress.contour_tls_secret)
+      targetNamespaces:
+        - "*"
