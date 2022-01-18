@@ -87,7 +87,6 @@ Run the installation script.
     tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.0.0 --values-file generated/tap-values.yaml -n tap-install
     ```
 - You can get a list of all the installed TAP packages via `tanzu package installed list -n tap-install` or `kubectl get PackageInstall -n tap-install` and have closer look at one of the installed packages via `kubectl describe PackageInstall <package-name> -n tap-install`
-- You 
 
 ## Usage
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html)
@@ -129,7 +128,34 @@ tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE
 - [kubectl tree](https://github.com/ahmetb/kubectl-tree) is great [krew](https://krew.sigs.k8s.io) plugin to explore ownership relationships between Kubernetes objects. Here is an example for the created Workload:
 ```
 kubectl tree workload tanzu-java-web-app -n $DEVELOPER_NAMESPACE
+NAMESPACE  NAME                                                  READY    REASON               AGE
+dev-space  Workload/tanzu-java-web-app                           True     Ready                5m51s
+dev-space  ├─ConfigMap/tanzu-java-web-app                        -                             3m6s
+dev-space  ├─Deliverable/tanzu-java-web-app                      Unknown  ConditionNotMet      5m43s
+dev-space  │ ├─App/tanzu-java-web-app                            -                             2m34s
+dev-space  │ └─ImageRepository/tanzu-java-web-app-delivery       True                          5m39s
+dev-space  ├─GitRepository/tanzu-java-web-app                    True     GitOperationSucceed  5m47s
+dev-space  ├─Image/tanzu-java-web-app                            True                          4m51s
+dev-space  │ ├─Build/tanzu-java-web-app-build-1                  -                             4m51s
+dev-space  │ │ └─Pod/tanzu-java-web-app-build-1-build-pod        False    PodCompleted         4m50s
+dev-space  │ ├─PersistentVolumeClaim/tanzu-java-web-app-cache    -                             4m51s
+dev-space  │ └─SourceResolver/tanzu-java-web-app-source          True                          4m51s
+dev-space  ├─ImageScan/tanzu-java-web-app                        -                             3m46s
+dev-space  │ └─Job/scan-tanzu-java-web-appzgfvv                  -                             3m46s
+dev-space  │   └─Pod/scan-tanzu-java-web-appzgfvv-fjf4g          False    PodCompleted         3m46s
+dev-space  ├─PodIntent/tanzu-java-web-app                        True                          3m10s
+dev-space  ├─Runnable/tanzu-java-web-app                         True     Ready                5m43s
+dev-space  │ └─PipelineRun/tanzu-java-web-app-kx2ff              -                             5m39s
+dev-space  │   └─TaskRun/tanzu-java-web-app-kx2ff-test           -                             5m39s
+dev-space  │     └─Pod/tanzu-java-web-app-kx2ff-test-pod         False    PodCompleted         5m39s
+dev-space  ├─Runnable/tanzu-java-web-app-config-writer           True     Ready                3m6s
+dev-space  │ └─TaskRun/tanzu-java-web-app-config-writer-7hfr6    -                             3m3s
+dev-space  │   └─Pod/tanzu-java-web-app-config-writer-7hfr6-pod  False    PodCompleted         3m3s
+dev-space  └─SourceScan/tanzu-java-web-app                       -                             5m7s
+dev-space    └─Job/scan-tanzu-java-web-appmbg65                  -                             5m7s
+dev-space      └─Pod/scan-tanzu-java-web-appmbg65-b8k9k          False    PodCompleted         5m7s
 ```
+- If the `mvnw` executable in your workload's repository doesn't have executable permissions(`chmod +x mvnw`) the Tektok pipeline will fail with a `./mvnw: Permission denied` error. To fix this for all java Maven workloads, this is done in the `demo/tekton-pipeline.yaml`.
 
 ### Query for vulnerabilities
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-scst-store-query_data.html)
@@ -142,7 +168,7 @@ or query the metrics store with the insight CLI. [Documentation](https://docs.vm
 export METADATA_STORE_ACCESS_TOKEN=$(kubectl get secrets -n metadata-store -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='metadata-store-read-write-client')].data.token}" | base64 -d)
 export INGRESS_DOMAIN=$(cat values.yaml | grep ingress -A 3 | awk '/domain:/ {print $2}')
 
-insight config set-target https://metadata-store.${INGRESS_DOMAIN} --access-token=$METADATA_STORE_ACCESS_TOKEN --ca-cert
+insight config set-target https://metadata-store.${INGRESS_DOMAIN} --access-token=$METADATA_STORE_ACCESS_TOKEN
 EXAMPLE_DIGEST=$(kubectl get kservice tanzu-java-web-app -n $DEVELOPER_NAMESPACE -o jsonpath='{.spec.template.spec.containers[0].image}' | awk -F @ '{ print $2 }')
 insight image get --digest $EXAMPLE_DIGEST --format json
 insight image packages --digest $EXAMPLE_DIGEST --format json
