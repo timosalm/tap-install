@@ -17,17 +17,17 @@ tanzu package repository add tanzu-tap-repository \
 tanzu package repository get tanzu-tap-repository --namespace tap-install
 
 ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-values.yaml
+
+DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
+kubectl create ns $DEVELOPER_NAMESPACE
+
 tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file generated/tap-values.yaml -n tap-install
 
 # install external dns
 kubectl create ns tanzu-system-ingress
-kubectl apply -f ingress-config/
-
 ytt --ignore-unknown-comments -f values.yaml -f ingress-config/ | kubectl apply -f-
 
 # configure developer namespace
-DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
-kubectl create ns $DEVELOPER_NAMESPACE
 export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/hostname:/ {print $2}')
 export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/username:/ {print $2}')
 export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 3 | awk '/password:/ {print $2}')
