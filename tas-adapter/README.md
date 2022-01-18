@@ -38,7 +38,8 @@ Run the installation script.
 	```
 ## Usage
 ```
-cf api api-tas-adapter.<your-ingress-domain>
+export INGRESS_DOMAIN=$(cat values.yaml | grep ingress -A 3 | awk '/domain:/ {print $2}')
+cf api api-tas-adapter.${INGRESS_DOMAIN}
 cf login
 cf create-org my-org
 cf target -o "my-org"
