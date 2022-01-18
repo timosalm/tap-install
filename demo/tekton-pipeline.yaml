@@ -28,4 +28,5 @@ spec:
               cd `mktemp -d`
 
               wget -qO- $(params.source-url) | tar xvz
+              chmod a+x ./mvnw
               ./mvnw test
