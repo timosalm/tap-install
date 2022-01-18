@@ -30,8 +30,7 @@ gcloud container clusters get-credentials tap --zone $CLUSTER_ZONE
 ```
 Configure Pod Security Policies so that Tanzu Application Platform controller pods can run as root.
 ```
-kubectl create clusterrolebinding privileged-kapp-controller-cluster-role-binding --clusterrole=cluster-admin  --serviceaccount=kapp-controller:kapp-controller-sa
-kubectl create clusterrolebinding privileged-secretgen-controller-cluster-role-binding --clusterrole=cluster-admin  --serviceaccount=secretgen-controller:secretgen-controller-sa
+kubectl create clusterrolebinding tap-psp-rolebinding --group=system:authenticated --clusterrole=gce:podsecuritypolicy:privileged
 ```
 ## Install Cluster Essentials for VMware Tanzu
 
