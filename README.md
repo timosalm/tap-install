@@ -25,7 +25,7 @@ It looks like there is an [issue](https://jira.eng.vmware.com/browse/TANZUSC-821
 With the following commands, you can provision a cluster with the [gcloud CLI](https://cloud.google.com/sdk/docs/install).
 ```
 CLUSTER_ZONE=europe-west3-a
-gcloud container clusters create tap --zone $CLUSTER_ZONE --cluster-version "1.21.5-gke.1302" --machine-type "e2-standard-4" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
+gcloud beta container clusters create tap --zone $CLUSTER_ZONE --cluster-version "1.21.5-gke.1302" --machine-type "e2-standard-4" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
 gcloud container clusters get-credentials tap --zone $CLUSTER_ZONE
 ```
 
