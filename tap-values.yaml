@@ -24,6 +24,7 @@ learningcenter:
   ingressDomain: #@ "learning-center.{}".format(data.values.ingress.domain)
   ingressSecret:
     secretName: #@ "learning-center-{}".format(data.values.ingress.contour_tls_secret)
+  ingressClass: contour-external
 tap_gui:
   ingressEnabled: true
   ingressDomain: #@ data.values.ingress.domain
