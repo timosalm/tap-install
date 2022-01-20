@@ -10,9 +10,10 @@ To also install the [Application Service Adapter for VMware Tanzu Application Pl
 ## Resources
  - [1.0 documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-overview.html)
 
-## Prerequisities
-- [Pivnet CLI](https://github.com/pivotal-cf/pivnet-cli#installing)
+## Prerequisities 
+[Pivnet CLI](https://github.com/pivotal-cf/pivnet-cli#installing)
 - You have to create the following private projects in Harbor `tap`, `tap-wkld`. For other registries you may have to change the format of the `kp_default_repository` and `ootb_supply_chain_testing_scanning.registry.repository` configuration values in `tap-values.yaml` 
+- A domain (configured in Route53)
 
 ## Provision a Kubernetes cluster
 
