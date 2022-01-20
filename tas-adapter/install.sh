@@ -27,8 +27,9 @@ tanzu package install tas-adapter \
   --values-file generated/tas-adapter-values.yaml \
   --namespace tas-adapter-install
 
-kubectl create secret generic ingress-secret-name-overlay --from-file=ingress-secret-name-overlay.yaml=overlays/tas-adapter/ingress-overlay.yaml --from-file=overlays/tas-adapter/workload-configuration-overlay.yaml --from-file=schema-overlay.yaml=overlays/tas-adapter/schema-overlay.yaml -n tas-adapter-install
-kubectl annotate packageinstalls tas-adapter -n tas-adapter-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=ingress-secret-name-overlay
+# Due to a bug with the ordering of files in ytt version 0.38.0, the schema override doesn't work and we have to specific the full schema in the schema-overlay.yaml before the override as a workaround!
+kubectl create secret generic ingress-and-memory-overlay --from-file=ingress-secret-name-overlay.yaml=overlays/tas-adapter/ingress-overlay.yaml --from-file=overlays/tas-adapter/workload-configuration-overlay.yaml --from-file=schema-overlay.yaml=overlays/tas-adapter/schema-overlay.yaml -n tas-adapter-install
+kubectl annotate packageinstalls tas-adapter -n tas-adapter-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=ingress-and-memory-overlay
 
 # Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect 
 DEFAULT_APP_MEMORY_ALLOCATION=$(cat values.yaml  | grep default_app_memory_allocation | awk '/default_app_memory_allocation:/ {print $2}')

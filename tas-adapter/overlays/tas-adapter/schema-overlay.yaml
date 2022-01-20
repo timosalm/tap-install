@@ -1,4 +1,3 @@
-# Due to a bug with the ordering of files in ytt version 0.38.0, the schema override doesn't work and we have to specific the full schema in this file before the override as a workaround!
 #@data/values-schema
 ---
 api_ingress:
