@@ -12,3 +12,6 @@ app_ingress:
     key: "PLACEHOLDER"
 kpack_image_tag_prefix: #@ "{}/tas-adapter-droplets".format(data.values.container_registry.hostname)
 package_registry_base_path: #@ "{}/tas-adapter-packages".format(data.values.container_registry.hostname)
+contour_tls_secret: #@ data.values.ingress.contour_tls_secret
+contour_tls_namespace: #@ data.values.ingress.contour_tls_namespace
+default_app_memory_allocation: #@ data.values.ingress.default_app_memory_allocation

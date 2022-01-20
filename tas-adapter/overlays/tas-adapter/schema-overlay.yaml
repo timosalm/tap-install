@@ -1,0 +1,90 @@
+# Due to a bug with the ordering of files in ytt version 0.38.0, the schema override doesn't work and we have to specific the full schema in this file before the override as a workaround!
+#@data/values-schema
+---
+api_ingress:
+  fqdn: ""
+  tls:
+    crt: ""
+    key: ""
+kpack_cluster_builder_name: "default"
+kpack_image_tag_prefix: ""
+package_registry_base_path: ""
+
+app_ingress:
+  default_domain: ""
+  tls:
+    crt: ""
+    key: ""
+
+scaling:
+  cf_k8s_api:
+    limits:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    requests:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    #@schema/nullable
+    replicas: 0
+  cf_k8s_controllers:
+    limits:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    requests:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    #@schema/nullable
+    replicas: 0
+  eirini_controller:
+    limits:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    requests:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    #@schema/nullable
+    replicas: 0
+  hnc_manager:
+    limits:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    requests:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    #@schema/nullable
+    replicas: 0
+  kube_rbac_proxy:
+    limits:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+    requests:
+      #@schema/nullable
+      cpu: ""
+      #@schema/nullable
+      memory: ""
+#@data/values-schema
+---
+#@overlay/match missing_ok=True
+contour_tls_secret: ""
+#@overlay/match missing_ok=True
+contour_tls_namespace: ""
+#@overlay/match missing_ok=True
+default_app_memory_allocation: 500

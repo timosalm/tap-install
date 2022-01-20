@@ -27,21 +27,9 @@ tanzu package install tas-adapter \
   --values-file generated/tas-adapter-values.yaml \
   --namespace tas-adapter-install
 
-INGRESS_TLS_SECRET_NAME=$(cat values.yaml | grep ingress -A 3 | awk '/contour_tls_secret:/ {print $2}')
-INGRESS_TLS_SECRET_NAMESPACE=$(cat values.yaml | grep ingress -A 3 | awk '/contour_tls_namespace:/ {print $2}')
-cp overlays/tas-adapter/ingress-overlay.yaml generated/ingress-overlay.yaml
-sed -i"" -e "s/INGRESS_TLS_SECRET_NAMESPACE/$INGRESS_TLS_SECRET_NAMESPACE/" generated/ingress-overlay.yaml
-sed -i"" -e "s/INGRESS_TLS_SECRET_NAME/$INGRESS_TLS_SECRET_NAME/" generated/ingress-overlay.yaml
-kubectl create secret generic ingress-secret-name-overlay --from-file=ingress-secret-name-overlay.yaml=generated/ingress-overlay.yaml -n tas-adapter-install
+kubectl create secret generic ingress-secret-name-overlay --from-file=ingress-secret-name-overlay.yaml=overlays/tas-adapter/ingress-overlay.yaml --from-file=overlays/tas-adapter/workload-configuration-overlay.yaml --from-file=schema-overlay.yaml=overlays/tas-adapter/schema-overlay.yaml -n tas-adapter-install
 kubectl annotate packageinstalls tas-adapter -n tas-adapter-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=ingress-secret-name-overlay
 
-DEFAULT_APP_MEMORY_ALLOCATION=$(cat values.yaml  | grep default_app_memory_allocation | awk '/default_app_memory_allocation:/ {print $2}')
-cp overlays/tas-adapter/workload-configuration-overlay.yaml generated/workload-configuration-overlay.yaml
-sed -i"" -e "s/INGRESS_TLS_SECRET_NAMESPACE/$INGRESS_TLS_SECRET_NAMESPACE/" generated/workload-configuration-overlay.yaml
-sed -i"" -e "s/INGRESS_TLS_SECRET_NAME/$INGRESS_TLS_SECRET_NAME/" generated/workload-configuration-overlay.yaml
-sed -i"" -e "s/DEFAULT_APP_MEMORY_ALLOCATION/$DEFAULT_APP_MEMORY_ALLOCATION/" generated/workload-configuration-overlay.yaml
-kubectl create secret generic workload-configuration-overlay --from-file=workload-configuration-overlay.yaml=generated/workload-configuration-overlay.yaml -n tas-adapter-install
-kubectl annotate packageinstalls tas-adapter -n tas-adapter-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.1=workload-configuration-overlay
 # Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect 
 DEFAULT_APP_MEMORY_ALLOCATION=$(cat values.yaml  | grep default_app_memory_allocation | awk '/default_app_memory_allocation:/ {print $2}')
 OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
