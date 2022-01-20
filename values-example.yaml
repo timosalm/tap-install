@@ -4,7 +4,7 @@ tanzunet:
   username: user@example.com
   password:
 ingress:
-  domain: example.com
+  domain: example.com # In case you want to use a subdomain(e.g. tap.aws.example.com) of your configured hosted zone(e.g. aws.example.com), you have to change the "--domain-filter=" argument value for the external-dns Deployment in the ingress-config/external-dns.yaml to the hosted zone domain(e.g. aws.example.com) instead of the variable value (which is the subdomain)!
   contour_tls_namespace: tanzu-system-ingress
   contour_tls_secret: contour-tls-delegation-cert
 container_registry:
