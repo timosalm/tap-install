@@ -1,0 +1,16 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: tap-gui
+  namespace: tap-gui
+spec:
+  routes:
+  - services:
+    - name: server
+      port: 7000
+  virtualhost:
+    fqdn: #@ "tap-gui.{}".format(data.values.ingress.domain)
+    tls:
+      secretName: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)

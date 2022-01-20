@@ -38,6 +38,26 @@ tap_gui:
         origin: #@ "https://tap-gui.{}".format(data.values.ingress.domain)
     app:
       baseUrl: #@ "https://tap-gui.{}".format(data.values.ingress.domain)
+    #@ if/end data.values.tap.okta.status == "enable":
+    auth:
+      allowGuestAccess: true
+      environment: development
+      providers:
+        okta:
+          development:
+            clientId: #@ data.values.tap.okta.clientId
+            clientSecret: #@ data.values.tap.okta.clientSecret
+            audience: #@ data.values.tap.okta.audience
+    #@ if/end data.values.tap.integrations.status == "enable":
+    integrations:
+     github:
+      - host: #@ data.values.tap.integrations.github.host
+        token: #@ data.values.tap.integrations.github.token
+    #@ if/end data.values.tap.catalog.status == "enable":
+    catalog:
+     locations:
+      - type: url
+        target: #@ data.values.tap.catalog.url.target
 
 metadata_store:
   app_service_type: ClusterIP # (optional) Defaults to LoadBalancer. Change to NodePort for distributions that don't support LoadBalancer

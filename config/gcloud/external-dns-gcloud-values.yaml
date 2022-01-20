@@ -1,0 +1,28 @@
+#@ load("@ytt:data", "data")
+---
+namespace: tanzu-system-service-discovery
+deployment:
+  args:
+    - --source=service
+    - --source=ingress
+    - --source=contour-httpproxy
+    - #@ "--domain-filter=" + data.values.ingress.domain
+    - --provider=google
+    - --policy=upsert-only #! would prevent ExternalDNS from deleting any records, omit to enable full synchronization
+    - #@ "--google-project=" + data.values.gcloud.project_name
+    - --registry=txt
+    - --txt-owner-id=tap
+    - --txt-prefix=xdns-
+  env:
+    - name: GOOGLE_APPLICATION_CREDENTIALS
+      value: /etc/secrets/service-account/credentials.json
+  volumeMounts:
+    - name: google-service-account
+      mountPath: /etc/secrets/service-account/
+  volumes:
+    - name: google-service-account
+      secret:
+        secretName: gcloud-dns-credentials
+        items:
+          - key: credentials.json
+            path: credentials.json

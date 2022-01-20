@@ -20,3 +20,24 @@ aws:
     accessKey: 
     secretKey: 
   zoneId:
+gcloud:
+  project_name: exampleproject
+provider-config:
+  dns: gcloud-dns     # or aws
+  k8s: gke            # or tkg
+tap:
+  version: 1
+  okta:
+    status: enable
+    clientId: clientid-value
+    clientSecret: clientsecret-value
+    audience: https://dev-changeme.okta.com
+  integrations:
+    status: enable
+    github:
+      host: github.com
+      token: changemetoken
+  catalog:
+    status: enable
+    url:
+      target: https://github.com/gorkemozlu/tap-blank-catalog/blob/main/blank/catalog-info.yaml
