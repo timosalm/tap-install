@@ -6,17 +6,31 @@ export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(cat values.yaml | grep tanzunet -A 3 | awk '/username:/ {print $2}')
 export INSTALL_REGISTRY_PASSWORD=$(cat values.yaml  | grep tanzunet -A 3 | awk '/password:/ {print $2}')
 export VALUES_YAML=values-example.yaml
-
+export PROJECT_ID=$(yq e .gcloud.project_name $VALUES_YAML)
 
 if [ $(yq e .provider-config.dns $VALUES_YAML) = "gcloud-dns" ] && [ $(yq e .provider-config.k8s $VALUES_YAML) != "tkg" ];
 then
 
   kubectl create ns tanzu-kapp
   kubectl create namespace tanzu-system-service-discovery
-  
+
+  CLOUD_DNS_SA=dns-admin-$(date +%s)
+  gcloud --project $PROJECT_ID iam service-accounts create $CLOUD_DNS_SA \
+      --display-name "Service Account to support ACME DNS-01 challenge."
+  CLOUD_DNS_SA=$CLOUD_DNS_SA@$PROJECT_ID.iam.gserviceaccount.com
+  gcloud projects add-iam-policy-binding $PROJECT_ID \
+       --member serviceAccount:$CLOUD_DNS_SA \
+       --role roles/dns.admin
+  gcloud iam service-accounts keys create generated/keys/key.json  --iam-account $CLOUD_DNS_SA
+
+  while cat generated/keys/key.json 2> /dev/null | grep $PROJECT_ID >> /dev/null; [ $? -ne 0 ]; do
+  	echo key.json file for gcloud-dns service account not created yet. Sleeping 60s
+  	sleep 30s
+  done
+
   kubectl -n tanzu-system-service-discovery create secret \
       generic gcloud-dns-credentials \
-      --from-file=credentials.json=generated/keys/gcloud-dns-credentials.json \
+      --from-file=credentials.json=generated/keys/key.json \
       -o yaml --dry-run=client | kubectl apply -f-
   
   ytt --ignore-unknown-comments -f values.yaml -f config/gcloud/external-dns-gcloud-values.yaml  > generated/external-dns-gcloud-values.yaml
@@ -31,6 +45,10 @@ then
 
 fi
 
+while kubectl get app external-dns -n tanzu-kapp | grep "Reconcile succeeded" ; [ $? -ne 0 ]; do
+	echo external-dns is not ready yet. Sleeping 60s
+	sleep 60s
+done
 
 kubectl create ns tap-install
 tanzu secret registry add tap-registry \
@@ -42,6 +60,11 @@ tanzu package repository add tanzu-tap-repository \
   --namespace tap-install
 tanzu package repository get tanzu-tap-repository --namespace tap-install
 
+while tanzu package repository get tanzu-tap-repository --namespace tap-install | grep "Reconcile succeeded" ; [ $? -ne 0 ]; do
+	echo Tanzu Application Platform repo is not ready yet. Sleeping 60s
+	sleep 60s
+done
+
 ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-values.yaml
 
 DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
@@ -49,19 +72,18 @@ kubectl create ns $DEVELOPER_NAMESPACE
 
 tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file generated/tap-values.yaml -n tap-install
 
-
+while kubectl get app tap -n tap-install | grep "Reconcile succeeded" ; [ $? -ne 0 ]; do
+	echo Tanzu Application Platform is not ready yet. Sleeping 60s
+	sleep 60s
+done
 
 if [ $(yq e .provider-config.dns $VALUES_YAML) = "gcloud-dns" ];
 then
 
-  CLOUD_DNS_SA=certmgr-cdns-admin-$(date +%s)
-  gcloud --project $PROJECT_ID iam service-accounts create $CLOUD_DNS_SA \
-      --display-name "Service Account to support ACME DNS-01 challenge."
-  CLOUD_DNS_SA=$CLOUD_DNS_SA@$PROJECT_ID.iam.gserviceaccount.com
-  gcloud projects add-iam-policy-binding $PROJECT_ID \
-       --member serviceAccount:$CLOUD_DNS_SA \
-       --role roles/dns.admin
-  gcloud iam service-accounts keys create generated/keys/key.json  --iam-account $CLOUD_DNS_SA
+  while cat generated/keys/key.json 2> /dev/null | grep $PROJECT_ID >> /dev/null; [ $? -ne 0 ]; do
+  	echo key.json file for gcloud-dns service account not created yet. Sleeping 60s
+  	sleep 30s
+  done
   kubectl create secret generic clouddns-dns01-solver-svc-acct -n cert-manager \
      --from-file=generated/keys/key.json
   
