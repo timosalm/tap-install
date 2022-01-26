@@ -5,7 +5,7 @@ mkdir -p generated/keys
 export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(cat values.yaml | grep tanzunet -A 3 | awk '/username:/ {print $2}')
 export INSTALL_REGISTRY_PASSWORD=$(cat values.yaml  | grep tanzunet -A 3 | awk '/password:/ {print $2}')
-export VALUES_YAML=values-example.yaml
+export VALUES_YAML=values.yaml
 export PROJECT_ID=$(yq e .gcloud.project_name $VALUES_YAML)
 
 if [ $(yq e .provider-config.dns $VALUES_YAML) = "gcloud-dns" ] && [ $(yq e .provider-config.k8s $VALUES_YAML) != "tkg" ];

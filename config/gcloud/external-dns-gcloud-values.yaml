@@ -6,7 +6,7 @@ deployment:
     - --source=service
     - --source=ingress
     - --source=contour-httpproxy
-    - #@ "--domain-filter=" + data.values.gcloud.zone-name
+    - #@ "--domain-filter=" + data.values.gcloud.zone_name
     - --provider=google
     - --policy=upsert-only #! would prevent ExternalDNS from deleting any records, omit to enable full synchronization
     - #@ "--google-project=" + data.values.gcloud.project_name
