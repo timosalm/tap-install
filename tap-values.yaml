@@ -63,7 +63,7 @@ accelerator:
 cnrs:
   domain_name: #@ "cnr.{}".format(data.values.ingress.domain)
   domain_template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
-  default_tls_secret: #@ "{}/{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
+  default_tls_secret: #@ "{}/cnr-{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
 
 grype:
   namespace: #@ data.values.developer_namespace
