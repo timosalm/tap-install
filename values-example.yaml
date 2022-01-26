@@ -16,7 +16,7 @@ acme:
   email: user@example.com
 aws:
   region: eu-central-1
-  credentials:
+  credentials: # Note internal VMware users: CloudGate credentials will not have the necessary permissions to work
     accessKey: 
     secretKey: 
-  zoneId:
+  route_fifty_three_zone_id:
