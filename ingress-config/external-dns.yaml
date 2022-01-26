@@ -73,7 +73,7 @@ spec:
         - --aws-prefer-cname
         - --policy=upsert-only
         - --txt-prefix=txt 
-        - #@ "--txt-owner-id=" + str(data.values.aws.zoneId)  
+        - #@ "--txt-owner-id=" + str(data.values.aws.route_fifty_three_zone_id)  
         - --registry=txt
         env:
          - name: AWS_ACCESS_KEY_ID
@@ -93,5 +93,5 @@ metadata:
   name: route53-credentials
   namespace: external-dns
 stringData:
-  aws_access_key_id: #@ base64.encode(data.values.aws.credentials.accessKey)
-  aws_secret_access_key: #@ base64.encode(data.values.aws.credentials.secretKey)
+  aws_access_key_id: #@ data.values.aws.credentials.accessKey
+  aws_secret_access_key: #@ data.values.aws.credentials.secretKey

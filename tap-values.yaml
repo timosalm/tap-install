@@ -9,7 +9,7 @@ buildservice:
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: true
-  descriptor_name: full
+  descriptor_name: tap-1.0.0-full
 
 supply_chain: testing_scanning
 
@@ -24,6 +24,7 @@ learningcenter:
   ingressDomain: #@ "learning-center.{}".format(data.values.ingress.domain)
   ingressSecret:
     secretName: #@ "learning-center-{}".format(data.values.ingress.contour_tls_secret)
+
 tap_gui:
   ingressEnabled: true
   ingressDomain: #@ data.values.ingress.domain

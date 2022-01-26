@@ -25,7 +25,7 @@ spec:
       - dns01:
           route53:
             region: #@ data.values.aws.region
-            hostedZoneID: #@ data.values.aws.zoneId
+            hostedZoneID: #@ data.values.aws.route_fifty_three_zone_id
             accessKeyID: #@ data.values.aws.credentials.accessKey
             secretAccessKeySecretRef:
               name: prod-route53-credentials-secret
