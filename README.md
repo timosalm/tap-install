@@ -17,7 +17,7 @@ To also install the [Application Service Adapter for VMware Tanzu Application Pl
 
 ## Provision a Kubernetes cluster
 
-The scripts are currently only validated with GKE and AWS EKS!
+The scripts are currently only validated with GKE and AWS EKS, and Azure AKS!
 
 ### GKE
 
@@ -34,7 +34,8 @@ Configure Pod Security Policies so that Tanzu Application Platform controller po
 kubectl create clusterrolebinding tap-psp-rolebinding --group=system:authenticated --clusterrole=gce:podsecuritypolicy:privileged
 ```
 
-### EKS
+### AWS EKS
+With the following commands, you can provision a cluster with the [aws CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 ```
 aws configure
 export CLUSTER_NAME=tap-demo
@@ -65,6 +66,28 @@ aws eks create-nodegroup --cluster-name ${CLUSTER_NAME} --kubernetes-version 1.2
 aws eks wait nodegroup-active --cluster-name ${CLUSTER_NAME} --nodegroup-name ${CLUSTER_NAME}-node-group
 
 aws eks update-kubeconfig --name ${CLUSTER_NAME}
+```
+
+### AKS Azure
+With the following commands, you can provision a cluster with the [az CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+
+```
+export CLUSTER_NAME=tap-demo
+az login
+az group create --location germanywestcentral --name ${CLUSTER_NAME}
+
+# Add pod security policies support preview (required for learningcenter)
+az extension add --name aks-preview
+az feature register --name PodSecurityPolicyPreview --namespace Microsoft.ContainerService
+# Wait until the status is "Registered"
+az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/PodSecurityPolicyPreview')].{Name:name,State:properties.state}"
+az provider register --namespace Microsoft.ContainerService
+
+az aks create --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME} --node-count 4 --enable-addons monitoring --node-vm-size Standard_DS3_v2 --node-osdisk-size 500 --enable-pod-security-policy
+
+az aks get-credentials --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME}
+
+kubectl create clusterrolebinding tap-psp-rolebinding --group=system:authenticated --clusterrole=psp:privileged
 ```
 
 ## Install Cluster Essentials for VMware Tanzu
