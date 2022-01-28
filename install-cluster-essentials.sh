@@ -1,7 +1,5 @@
 #!/bin/bash
 
-platform="$1"
-
 case "${1:linux}" in
 	darwin) PRODUCT_ID=1105820;;
 	linux) PRODUCT_ID=1105818;;
