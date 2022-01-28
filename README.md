@@ -95,9 +95,17 @@ kubectl create clusterrolebinding tap-psp-rolebinding --group=system:authenticat
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#tanzu-cluster-essentials)
 
 The Cluster Essentials are already installed if you are operating a Tanzu Kubernetes Grid or Tanzu Community Edition cluster.
-For other Kubernetes providers, follow the steps below:
+For other Kubernetes providers, follow the steps below. 
+
+If you're running on a Linux box:
 ```
-./install-cluster-essentials.sh
+./install-cluster-essentials.sh linux
+sudo install tanzu-cluster-essentials/kapp /usr/local/bin/kapp 
+```
+
+If you're running on a Mac:
+```
+./install-cluster-essentials.sh darwin
 sudo install tanzu-cluster-essentials/kapp /usr/local/bin/kapp 
 ```
 
