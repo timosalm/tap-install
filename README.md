@@ -112,8 +112,14 @@ sudo install tanzu-cluster-essentials/kapp /usr/local/bin/kapp
 ## Install Tanzu CLI
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#install-or-update-the-tanzu-cli-and-plugins-7)
 ### Clean install
+If you're running on a Linux box:
 ```
-./install-cli.sh
+./install-cli.sh linux
+```
+
+If you're running on a Mac:
+```
+./install-cli.sh darwin
 ```
 ### Update Tanzu CLI 
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#instructions-for-updating-tanzu-cli-that-was-installed-for-a-previous-release-of-tanzu-application-platform-10)
