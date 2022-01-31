@@ -3,14 +3,14 @@
 This installation guide should help you to install TAP 1.0 with wildcard certificates and [external-dns](https://github.com/kubernetes-sigs/external-dns) to a Kubernetes cluster.
 
 It's always recommended to go through the official documentation in addition to this guide!
-The scripts and commands in this guide were executed on a Amazon Linux 2 jumpbox. It's recommended to go through them step by step!
+The scripts and commands in this guide were executed on an Amazon Linux 2 jumpbox. It's recommended to go through them step by step!
 
 To also install the [Application Service Adapter for VMware Tanzu Application Platform public beta](https://tanzu.vmware.com/content/blog/application-service-adapter-for-vmware-tanzu-application-platform-2), you can follow the instructions [here](tas-adapter) after the installation of TAP.
 
 ## Resources
  - [1.0 documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-overview.html)
 
-## Prerequisities 
+## Prerequisites 
 [Pivnet CLI](https://github.com/pivotal-cf/pivnet-cli#installing)
 - You have to create the following private projects in Harbor `tap`, `tap-wkld`. For other registries you may have to change the format of the `kp_default_repository` and `ootb_supply_chain_testing_scanning.registry.repository` configuration values in `tap-values.yaml` 
 - A domain (configured in Route53)
@@ -101,7 +101,7 @@ For other Kubernetes providers, follow the steps below:
 sudo install tanzu-cluster-essentials/kapp /usr/local/bin/kapp 
 ```
 
-## Intall Tanzu CLI
+## Install Tanzu CLI
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#install-or-update-the-tanzu-cli-and-plugins-7)
 ### Clean install
 ```
@@ -109,7 +109,7 @@ sudo install tanzu-cluster-essentials/kapp /usr/local/bin/kapp
 ```
 ### Update Tanzu CLI 
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#instructions-for-updating-tanzu-cli-that-was-installed-for-a-previous-release-of-tanzu-application-platform-10)
-If the the instructions doesn't work and the `tanzu version` output is not as expected(v0.10.0), you can delete the wrong CLI version 
+If the instructions don't work and the `tanzu version` output is not as expected(v0.10.0), you can delete the wrong CLI version 
 with the following commands and do a clean install.
 ```
 sudo rm /usr/local/bin/tanzu
@@ -135,7 +135,7 @@ Run the installation script.
 ```
 
 ### Tips
-- If you want to have https instead of http in the output of the application url with e.g. `tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE`, you can se the `default-external-scheme` configuration to `https` in the following CNR configuration:
+- If you want to have HTTPS instead of HTTP in the output of the application URL with e.g. `tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE`, you can see the `default-external-scheme` configuration to `https` in the following CNR configuration:
     ```
     kubectl edit configmap config-network --namespace knative-serving
     ```
@@ -154,7 +154,7 @@ Save the configured developer namespace to an env variable via
 DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
 ```
 
-Create a Tekton CI pipline that runs the unit-tests via
+Create a Tekton CI pipeline that runs the unit-tests via
 ```
 kubectl apply -f demo/tekton-pipeline.yaml -n $DEVELOPER_NAMESPACE
 ```
