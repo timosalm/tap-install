@@ -54,7 +54,7 @@ cf push hello-world
 cf scale hello-world -i 1 --process executable-jar
 cf scale hello-world -i 1 --process task
 
-curl https://hello-world.tas-adapter.<your-ingress-domain> 
+curl "https://hello-world.tas-adapter.${INGRESS_DOMAIN}"
 
 cf apps
 cf routes
