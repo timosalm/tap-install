@@ -51,7 +51,7 @@ contour:
       type: LoadBalancer
 
 accelerator: 
-  domain: #@ "accelerator.{}".format(data.values.ingress.domain)                         
+  domain: #@ "{}".format(data.values.ingress.domain)                         
   ingress:
     include: true
   tls:
