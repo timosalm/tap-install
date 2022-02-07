@@ -22,7 +22,7 @@ The scripts are currently only validated with GKE and AWS EKS, and Azure AKS!
 ### GKE
 
 There is an [issue](https://jira.eng.vmware.com/browse/TANZUSC-821) with GKE Zonal type clusters during the installation where the cluster is overloaded even if there are enough resources available and it goes several times into a repair state / requests to the Kubernetes API timeout because Zonal clusters have a single control plane in a single zone. You have to wait for some time until every sub-package is in `ReconcileSucceeded` state. 
-For a better experience it's recommended to switch to a Regional type cluster.
+For a better experience it's **recommended to switch to a Regional type cluster**.
 
 With the following commands, you can provision a Regional type cluster with the [gcloud CLI](https://cloud.google.com/sdk/docs/install).
 ```
