@@ -28,7 +28,8 @@ With the following commands, you can provision a Regional type cluster with the 
 ```
 REGION=europe-west3
 CLUSTER_ZONE=europe-west3-a
-gcloud beta container clusters create tap --region $REGION --cluster-version "1.21.5-gke.1302" --machine-type "e2-standard-4" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
+CLUSTER_VERSION=$(gcloud container get-server-config --format="yaml(defaultClusterVersion)" --region $REGION | awk '/defaultClusterVersion:/ {print $2}')
+gcloud beta container clusters create tap --region $REGION --cluster-version $CLUSTER_VERSION --machine-type "e2-standard-4" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
 gcloud container clusters get-credentials tap --zone $CLUSTER_ZONE
 ```
 Configure Pod Security Policies so that Tanzu Application Platform controller pods can run as root.
