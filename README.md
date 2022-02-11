@@ -73,6 +73,7 @@ aws eks update-kubeconfig --name ${CLUSTER_NAME}
 
 ### AKS Azure
 With the following commands, you can provision a cluster with the [az CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli).
+If you already had the Azure CLI (and aks-preview extension) installed, please update them via `az upgrade` (and `az extension update -n aks-preview`).
 
 ```
 export CLUSTER_NAME=tap-demo
