@@ -14,7 +14,10 @@ app_ingress:
   tls:
     crt: ""
     key: ""
-
+app_registry_credentials:
+  username: ""
+  password: ""
+  hostname: ""
 scaling:
   cf_k8s_api:
     limits:
@@ -85,5 +88,3 @@ scaling:
 contour_tls_secret: ""
 #@overlay/match missing_ok=True
 contour_tls_namespace: ""
-#@overlay/match missing_ok=True
-default_app_memory_allocation: 500

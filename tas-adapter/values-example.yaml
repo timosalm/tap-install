@@ -11,4 +11,3 @@ container_registry:
   hostname: harbor.example.com
   username: admin
   password: 
-default_app_memory_allocation: 1000

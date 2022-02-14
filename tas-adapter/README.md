@@ -1,14 +1,11 @@
-# Unofficial Application Service Adapter for VMware Tanzu Application Platform (0.2.0)
+# Unofficial Application Service Adapter for VMware Tanzu Application Platform (0.3.0)
 
 It's always recommended to go through the official documentation in addition to this guide!
 The scripts and commands in this guide were executed on a Amazon Linux 2 jumpbox. It's recommended to go through them step by step!
 
 ## Resources
  - [Public beta announcement](https://tanzu.vmware.com/content/blog/application-service-adapter-for-vmware-tanzu-application-platform-2)
- - [0.2.0 documentation](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.2/tas-adapter-0-2/GUID-overview.html)
-
-## Things additionally handled in the installation script
-- The 500M default app memory allocation is not sufficient for Java apps, and the app manifest does not yet accept the memory parameter to set it on push -> Set default to 1024M
+ - [0.3.0 documentation](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.3/tas-adapter/GUID-overview.html)
 
 ## Prerequisities
 - You have to create the following private projects in Harbor `tas-adapter-droplets`, `tas-adapter-packages`. For other registries you may have to change the format of the `kpack_image_tag_prefix` and `package_registry_base_path` configuration values in `tas-adapter-values.yaml` 
@@ -26,16 +23,7 @@ Run the installation script.
 
 ## Known Issues / workarounds
 - If you further have to increase the app memory allocation and don't want to override the default values, you can run `cf scale APP-NAME -m 2G` after a `cf push APP-NAME`
-- If you have pushed an application with multiple processes, which is the case for most of e.g. the Spring Boot apps built by TBS, all commands related to apps fail with the following error:
-	```
-	Error unmarshalling the following into a cloud controller error: upstream connect error or disconnect/reset before headers. reset reason: connection termination
-	```
-	The workaround is to get all the processes via `curl /v3/processes | jq '.resources[] | {type, instances, relationships}'` and scale to 1 via `cf scale APP-NAME -i 1 --process PROCESS-TYPE`.
-	For a typical Spring Boot app the workaround should be:
-	```
-	cf scale APP-NAME -i 1 --process executable-jar
-	cf scale APP-NAME -i 1 --process task
-	```
+
 ## Usage
 ```
 export INGRESS_DOMAIN=$(cat values.yaml | grep ingress -A 3 | awk '/domain:/ {print $2}')
@@ -60,4 +48,8 @@ cf apps
 cf routes
 cf orgs
 cf spaces
+cf buildpacks
+cf restage
+cf delete-route
+cf set-env 
 ```

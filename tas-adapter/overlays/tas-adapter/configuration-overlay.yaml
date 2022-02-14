@@ -5,10 +5,6 @@
 #@ def updates():
 cfk8s_controller_namespace: #@ data.values.contour_tls_namespace
 workloads_tls_secret_name: #@ "tas-adapter-{}".format(data.values.contour_tls_secret)
-#@overlay/match when=1
-cfProcessDefaults:
-  #@overlay/match when=1
-  memoryMB: #@ data.values.default_app_memory_allocation
 #@ end
 
 #@overlay/match by=overlay.subset({"metadata":{"name":"cf-k8s-controllers-config"}, "kind": "ConfigMap"})
