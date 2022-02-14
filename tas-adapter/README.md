@@ -38,10 +38,6 @@ git clone https://github.com/tsalm-pivotal/spring-boot-hello-world.git
 cd spring-boot-hello-world
 cf push hello-world
 
-# See section "Known Issues / workarounds"
-cf scale hello-world -i 1 --process executable-jar
-cf scale hello-world -i 1 --process task
-
 curl "https://hello-world.tas-adapter.${INGRESS_DOMAIN}"
 
 cf apps
