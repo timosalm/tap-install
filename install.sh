@@ -12,7 +12,7 @@ tanzu secret registry add tap-registry \
   --server ${INSTALL_REGISTRY_HOSTNAME} \
   --export-to-all-namespaces --yes --namespace tap-install
 tanzu package repository add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.0.0 \
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.0.1 \
   --namespace tap-install
 tanzu package repository get tanzu-tap-repository --namespace tap-install
 
@@ -21,7 +21,7 @@ ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-
 DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
 kubectl create ns $DEVELOPER_NAMESPACE
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.0 --values-file generated/tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.1 --values-file generated/tap-values.yaml -n tap-install
 
 # install external dns
 kubectl create ns tanzu-system-ingress
