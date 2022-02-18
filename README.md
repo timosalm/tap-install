@@ -31,7 +31,7 @@ With the following commands, you can provision a Regional type cluster with the 
 REGION=europe-west3
 CLUSTER_ZONE="$REGION-a"
 CLUSTER_VERSION=$(gcloud container get-server-config --format="yaml(defaultClusterVersion)" --region $REGION | awk '/defaultClusterVersion:/ {print $2}')
-gcloud beta container clusters create tap --region $REGION --cluster-version $CLUSTER_VERSION --machine-type "e2-standard-4" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
+gcloud beta container clusters create tap --region $REGION --cluster-version $CLUSTER_VERSION --machine-type "e2-standard-2" --num-nodes "4" --node-locations $CLUSTER_ZONE --enable-pod-security-policy
 gcloud container clusters get-credentials tap --region $REGION
 ```
 Configure Pod Security Policies so that Tanzu Application Platform controller pods can run as root.
@@ -67,7 +67,7 @@ aws iam attach-role-policy --role-name "${CLUSTER_NAME}-eks-worker-role" --polic
 aws iam attach-role-policy --role-name "${CLUSTER_NAME}-eks-worker-role" --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
 
 # Create EKS worker nodes
-aws eks create-nodegroup --cluster-name ${CLUSTER_NAME} --kubernetes-version 1.21 --nodegroup-name "${CLUSTER_NAME}-node-group" --disk-size 500 --scaling-config minSize=4,maxSize=4,desiredSize=4 --subnets $(echo $SUBNET_IDS | sed 's/,/ /g') --instance-types t3a.xlarge --node-role ${WORKER_SERVICE_ROLE}
+aws eks create-nodegroup --cluster-name ${CLUSTER_NAME} --kubernetes-version 1.21 --nodegroup-name "${CLUSTER_NAME}-node-group" --disk-size 100 --scaling-config minSize=4,maxSize=4,desiredSize=4 --subnets $(echo $SUBNET_IDS | sed 's/,/ /g') --instance-types t3a.large --node-role ${WORKER_SERVICE_ROLE}
 aws eks wait nodegroup-active --cluster-name ${CLUSTER_NAME} --nodegroup-name ${CLUSTER_NAME}-node-group
 
 aws eks update-kubeconfig --name ${CLUSTER_NAME}
@@ -89,7 +89,7 @@ az feature register --name PodSecurityPolicyPreview --namespace Microsoft.Contai
 az feature list -o table --query "[?contains(name, 'Microsoft.ContainerService/PodSecurityPolicyPreview')].{Name:name,State:properties.state}"
 az provider register --namespace Microsoft.ContainerService
 
-az aks create --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME} --node-count 4 --enable-addons monitoring --node-vm-size Standard_DS3_v2 --node-osdisk-size 500 --enable-pod-security-policy
+az aks create --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME} --node-count 4 --enable-addons monitoring --node-vm-size Standard_DS2_v2 --node-osdisk-size 100 --enable-pod-security-policy
 
 az aks get-credentials --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME}
 
