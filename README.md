@@ -152,6 +152,26 @@ Run the installation script.
 ./install.sh
 ```
 
+## Create additional developer namespace
+Currently there is no way to support multiple developer namespaces with the profile installation for the OOTB Supply Chain with Testing and Scanning.
+The reason for that is that Custom Resources(CR) required for scanning (Grype) are, at this point, namespace-scoped instead of cluster-scoped. 
+
+This scripts helps you to create additional developer namespaces with everything setup.
+```
+./create-additional-dev-space.sh <dev-ns>
+```
+
+***Hint: With the following command, you can check whether your developer namespace contains the required CRs for scanning.***
+```
+kubectl get ScanTemplate -n <dev-ns>
+```
+
+## Delete additional developer namespace
+Deletes all resources created via the `create-additional-dev-space.sh` script.
+```
+./delete-additional-dev-space.sh <dev-ns>
+```
+
 ### Tips
 - If you want to have HTTPS instead of HTTP in the output of the application URL with e.g. `tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE`, you can see the `default-external-scheme` configuration to `https` in the following CNR configuration:
     ```
