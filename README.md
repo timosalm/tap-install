@@ -165,7 +165,15 @@ Run the installation script.
     tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.0.1 --values-file generated/tap-values.yaml -n tap-install
     ```
 - You can get a list of all the installed TAP packages via `tanzu package installed list -n tap-install` or `kubectl get PackageInstall -n tap-install` and have closer look at one of the installed packages via `kubectl describe PackageInstall <package-name> -n tap-install`
-
+- Workaround to get a PackageInstallation reconcile immediately.
+   ```
+   function reconcile-packageinstall() {
+           TAPNS=tap-install
+           kubectl -n $TAPNS patch packageinstalls.packaging.carvel.dev $1 --type='json' -p '[{"op": "add", "path": "/spec/paused", "value":true}]}}'
+           kubectl -n $TAPNS patch packageinstalls.packaging.carvel.dev $1 --type='json' -p '[{"op": "add", "path": "/spec/paused", "value":false}]}}'
+   }
+   reconcile-packageinstall <package-installation-name>
+   ```
 ## Create additional developer namespace
 Currently there is no way to support multiple developer namespaces with the profile installation for the OOTB Supply Chain with Testing and Scanning.
 The reason for that is that Custom Resources(CR) required for scanning (Grype) are, at this point, namespace-scoped instead of cluster-scoped. 
