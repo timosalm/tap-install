@@ -1,5 +1,7 @@
 # Unofficial TAP 1.0.1 installation guide 
 
+***What's New: Script for the creation of additional developer namespaces for the OOTB Supply Chain with Testing and Scanning***
+
 This installation guide should help you to install TAP 1.0.1 with wildcard certificates and [external-dns](https://github.com/kubernetes-sigs/external-dns) to a Kubernetes cluster.
 
 It's always recommended to go through the official documentation in addition to this guide!
@@ -152,26 +154,6 @@ Run the installation script.
 ./install.sh
 ```
 
-## Create additional developer namespace
-Currently there is no way to support multiple developer namespaces with the profile installation for the OOTB Supply Chain with Testing and Scanning.
-The reason for that is that Custom Resources(CR) required for scanning (Grype) are, at this point, namespace-scoped instead of cluster-scoped. 
-
-This scripts helps you to create additional developer namespaces with everything setup.
-```
-./create-additional-dev-space.sh <dev-ns>
-```
-
-***Hint: With the following command, you can check whether your developer namespace contains the required CRs for scanning.***
-```
-kubectl get ScanTemplate -n <dev-ns>
-```
-
-## Delete additional developer namespace
-Deletes all resources created via the `create-additional-dev-space.sh` script.
-```
-./delete-additional-dev-space.sh <dev-ns>
-```
-
 ### Tips
 - If you want to have HTTPS instead of HTTP in the output of the application URL with e.g. `tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE`, you can see the `default-external-scheme` configuration to `https` in the following CNR configuration:
     ```
@@ -183,6 +165,26 @@ Deletes all resources created via the `create-additional-dev-space.sh` script.
     tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.0.1 --values-file generated/tap-values.yaml -n tap-install
     ```
 - You can get a list of all the installed TAP packages via `tanzu package installed list -n tap-install` or `kubectl get PackageInstall -n tap-install` and have closer look at one of the installed packages via `kubectl describe PackageInstall <package-name> -n tap-install`
+
+## Create additional developer namespace
+Currently there is no way to support multiple developer namespaces with the profile installation for the OOTB Supply Chain with Testing and Scanning.
+The reason for that is that Custom Resources(CR) required for scanning (Grype) are, at this point, namespace-scoped instead of cluster-scoped. 
+
+This scripts helps you to create additional developer namespaces with everything setup.
+```
+./create-additional-dev-space.sh <dev-ns>
+```
+
+*Hint: With the following command, you can check whether your developer namespace contains the required CRs for scanning.*
+```
+kubectl get ScanTemplate -n <dev-ns>
+```
+
+## Delete additional developer namespace
+Deletes all resources created via the `create-additional-dev-space.sh` script.
+```
+./delete-additional-dev-space.sh <dev-ns>
+```
 
 ## Usage
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-getting-started.html)
