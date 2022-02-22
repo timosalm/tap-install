@@ -129,7 +129,7 @@ If you're running on a Mac:
 ```
 ### Update Tanzu CLI 
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#instructions-for-updating-tanzu-cli-that-was-installed-for-a-previous-release-of-tanzu-application-platform-10)
-If the instructions don't work and the `tanzu version` output is not as expected(v0.10.0), you can delete the wrong CLI version 
+If the instructions don't work and the `tanzu version` output is not as expected (v0.11.1), you can delete the wrong CLI version 
 with the following commands and do a clean install.
 ```
 sudo rm /usr/local/bin/tanzu
