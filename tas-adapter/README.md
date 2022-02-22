@@ -33,6 +33,7 @@ cf create-org my-org
 cf target -o "my-org"
 cf create-space my-space
 cf target -o "my-org" -s "my-space"
+kubectl hns tree cf # Shows the hierarchy of the namespaces created for the org and space
 
 git clone https://github.com/tsalm-pivotal/spring-boot-hello-world.git
 cd spring-boot-hello-world
