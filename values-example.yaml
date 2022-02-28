@@ -9,6 +9,7 @@ ingress:
   contour_tls_secret: contour-tls-delegation-cert
 container_registry:
   hostname: harbor.example.com
+  project: tap
   username: admin
   password: 
 developer_namespace: dev-space

@@ -3,7 +3,7 @@
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
 buildservice:
-  kp_default_repository: #@ "{}/tap/build-service".format(data.values.container_registry.hostname)
+  kp_default_repository: #@ "{}/{}/build-service".format(data.values.container_registry.hostname,data.values.container_registry.project)
   kp_default_repository_username: #@ data.values.container_registry.username
   kp_default_repository_password: #@ data.values.container_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
@@ -16,7 +16,7 @@ supply_chain: testing_scanning
 ootb_supply_chain_testing_scanning:
   registry:
     server: #@ data.values.container_registry.hostname
-    repository: "tap-wkld"
+    repository: #@ "{}-wkld".format(data.values.container_registry.project)
   gitops:
     ssh_secret: ""
 
