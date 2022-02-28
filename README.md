@@ -182,6 +182,7 @@ This scripts helps you to create additional developer namespaces with everything
 ```
 ./create-additional-dev-space.sh <dev-ns>
 ```
+The script will not create a Tekton CI pipeline or Scan Policy. See the [Usage](#usage) section on how to do this.
 
 *Hint: With the following command, you can check whether your developer namespace contains the required CRs for scanning.*
 ```
