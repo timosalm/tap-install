@@ -16,7 +16,7 @@ supply_chain: testing_scanning
 ootb_supply_chain_testing_scanning:
   registry:
     server: #@ data.values.container_registry.hostname
-    repository: #@ "{}-wkld".format(data.values.container_registry.project)
+    repository: #@ data.values.container_registry.project_workload
   gitops:
     ssh_secret: ""
 

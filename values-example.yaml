@@ -10,6 +10,7 @@ ingress:
 container_registry:
   hostname: harbor.example.com
   project: tap
+  project_workload: tap-wkld
   username: admin
   password: 
 developer_namespace: dev-space
