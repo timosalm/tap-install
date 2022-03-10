@@ -12,7 +12,7 @@ tanzu secret registry add tap-registry \
   --server ${INSTALL_REGISTRY_HOSTNAME} \
   --export-to-all-namespaces --yes --namespace tap-install
 tanzu package repository add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.0.1 \
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.0.2 \
   --namespace tap-install
 tanzu package repository get tanzu-tap-repository --namespace tap-install
 
@@ -21,7 +21,7 @@ ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-
 DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
 kubectl create ns $DEVELOPER_NAMESPACE
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.1 --values-file generated/tap-values.yaml -n tap-install
+tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.2 --values-file generated/tap-values.yaml -n tap-install
 
 # Use HTTPS instead of HTTP in the output of the application URL
 kubectl create secret generic tap-pkgi-overlay-0-cnrs-network-config --from-file=tap-pkgi-overlay-0-cnrs-network-config.yaml=overlays/cnrs/tap-pkgi-overlay-0-cnrs-network-config.yaml -n tap-install
@@ -32,9 +32,9 @@ kubectl create ns tanzu-system-ingress
 ytt --ignore-unknown-comments -f values.yaml -f ingress-config/ | kubectl apply -f-
 
 # configure developer namespace
-export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/hostname:/ {print $2}')
-export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/username:/ {print $2}')
-export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 3 | awk '/password:/ {print $2}')
+export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 4 | awk '/hostname:/ {print $2}')
+export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 4 | awk '/username:/ {print $2}')
+export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 4 | awk '/password:/ {print $2}')
 tanzu secret registry add registry-credentials --username ${CONTAINER_REGISTRY_USERNAME} --password ${CONTAINER_REGISTRY_PASSWORD} --server ${CONTAINER_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
 cat <<EOF | kubectl -n $DEVELOPER_NAMESPACE apply -f -
