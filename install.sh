@@ -23,6 +23,10 @@ kubectl create ns $DEVELOPER_NAMESPACE
 
 tanzu package install tap -p tap.tanzu.vmware.com -v 1.0.1 --values-file generated/tap-values.yaml -n tap-install
 
+# Use HTTPS instead of HTTP in the output of the application URL
+kubectl create secret generic tap-pkgi-overlay-0-cnrs-network-config --from-file=tap-pkgi-overlay-0-cnrs-network-config.yaml=overlays/cnrs/tap-pkgi-overlay-0-cnrs-network-config.yaml -n tap-install
+kubectl annotate packageinstalls tap -n tap-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=tap-pkgi-overlay-0-cnrs-network-config
+
 # install external dns
 kubectl create ns tanzu-system-ingress
 ytt --ignore-unknown-comments -f values.yaml -f ingress-config/ | kubectl apply -f-

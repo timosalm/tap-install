@@ -155,10 +155,6 @@ Run the installation script.
 ```
 
 ### Tips
-- If you want to have HTTPS instead of HTTP in the output of the application URL with e.g. `tanzu apps workload get tanzu-java-web-app -n $DEVELOPER_NAMESPACE`, you can see the `default-external-scheme` configuration to `https` in the following CNR configuration:
-    ```
-    kubectl edit configmap config-network --namespace knative-serving
-    ```
 - You can update installation on updates in your values.yaml via 
     ```
     ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-values.yaml
