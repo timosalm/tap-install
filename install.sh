@@ -32,9 +32,9 @@ kubectl create ns tanzu-system-ingress
 ytt --ignore-unknown-comments -f values.yaml -f ingress-config/ | kubectl apply -f-
 
 # configure developer namespace
-export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 4 | awk '/hostname:/ {print $2}')
-export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 4 | awk '/username:/ {print $2}')
-export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 4 | awk '/password:/ {print $2}')
+export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/hostname:/ {print $2}')
+export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/username:/ {print $2}')
+export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 5 | awk '/password:/ {print $2}')
 tanzu secret registry add registry-credentials --username ${CONTAINER_REGISTRY_USERNAME} --password ${CONTAINER_REGISTRY_PASSWORD} --server ${CONTAINER_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
 
 cat <<EOF | kubectl -n $DEVELOPER_NAMESPACE apply -f -

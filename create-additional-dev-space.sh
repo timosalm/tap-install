@@ -7,9 +7,9 @@ if [ -z "$1" ]
 fi
 
 kubectl create ns $1
-export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/hostname:/ {print $2}')
-export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 3 | awk '/username:/ {print $2}')
-export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 3 | awk '/password:/ {print $2}')
+export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/hostname:/ {print $2}')
+export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/username:/ {print $2}')
+export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 5 | awk '/password:/ {print $2}')
 kubectl create secret docker-registry registry-credentials --docker-server=${CONTAINER_REGISTRY_HOSTNAME} --docker-username=${CONTAINER_REGISTRY_USERNAME} --docker-password=${CONTAINER_REGISTRY_PASSWORD} -n $1
 
 cat <<EOF  | kubectl apply -n $1 -f -
