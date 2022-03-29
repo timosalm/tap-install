@@ -3,10 +3,6 @@ mkdir -p generated
 
 ytt --ignore-unknown-comments -f values.yaml -f additonal-ingress-config/ | kubectl apply -f-
 
-sudo wget -O /etc/yum.repos.d/cloudfoundry-cli.repo https://packages.cloudfoundry.org/fedora/cloudfoundry-cli.repo
-sudo yum install cf8-cli
-cf version
-
 kubectl create ns tas-adapter-install
 
 export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
@@ -18,12 +14,12 @@ tanzu secret registry add tap-registry \
   --namespace tas-adapter-install
 
 tanzu package repository add tas-adapter-repository \
-  --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.3.0 \
+  --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.4.0 \
   --namespace tas-adapter-install
 ytt -f tas-adapter-values.yaml -f values.yaml --ignore-unknown-comments > generated/tas-adapter-values.yaml
 tanzu package install tas-adapter \
   --package-name application-service-adapter.tanzu.vmware.com \
-  --version 0.3.0 \
+  --version 0.4.0 \
   --values-file generated/tas-adapter-values.yaml \
   --namespace tas-adapter-install
 
