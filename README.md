@@ -1,8 +1,8 @@
-# Unofficial TAP 1.0.2 installation guide 
+# Unofficial TAP 1.1 installation guide 
 
 ***What's New: Script for the creation of additional developer namespaces for the OOTB Supply Chain with Testing and Scanning***
 
-This installation guide should help you to install TAP 1.0.2 with wildcard certificates and [external-dns](https://github.com/kubernetes-sigs/external-dns) to a Kubernetes cluster.
+This installation guide should help you to install TAP 1.1 with wildcard certificates and [external-dns](https://github.com/kubernetes-sigs/external-dns) to a Kubernetes cluster.
 
 It's always recommended to go through the official documentation in addition to this guide!
 The scripts and commands in this guide were executed on an Amazon Linux 2 jumpbox. It's recommended to go through them step by step!
@@ -10,7 +10,7 @@ The scripts and commands in this guide were executed on an Amazon Linux 2 jumpbo
 To also install the [Application Service Adapter for VMware Tanzu Application Platform public beta](https://tanzu.vmware.com/content/blog/application-service-adapter-for-vmware-tanzu-application-platform-2), you can follow the instructions [here](tas-adapter) after the installation of TAP.
 
 ## Resources
- - [1.0.2 documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-overview.html)
+ - [1.1 documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-overview.html)
 
 ## Prerequisites 
 - [Pivnet CLI](https://github.com/pivotal-cf/pivnet-cli#installing)
@@ -160,7 +160,7 @@ Run the installation script.
 - You can update installation on updates in your values.yaml via 
     ```
     ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-values.yaml
-    tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.0.2 --values-file generated/tap-values.yaml -n tap-install
+    tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.1.0 --values-file generated/tap-values.yaml -n tap-install
     ```
 - You can get a list of all the installed TAP packages via `tanzu package installed list -n tap-install` or `kubectl get PackageInstall -n tap-install` and have closer look at one of the installed packages via `kubectl describe PackageInstall <package-name> -n tap-install`
 - Workaround to get a PackageInstallation reconcile immediately.

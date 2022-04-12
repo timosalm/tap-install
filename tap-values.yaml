@@ -9,7 +9,7 @@ buildservice:
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
   enable_automatic_dependency_updates: true
-  descriptor_name: tap-1.0.0-full
+  descriptor_name: full
 
 supply_chain: testing_scanning
 
