@@ -1,8 +1,8 @@
 #!/bin/bash
 
 case "${1:linux}" in
-	darwin) PRODUCT_ID=1105820;;
-	linux) PRODUCT_ID=1105818;;
+	darwin) PRODUCT_ID=1191985;;
+	linux) PRODUCT_ID=1191987;;
 esac
 
 pivnet download-product-files --product-slug='tanzu-cluster-essentials' --release-version='1.0.0' --product-file-id=$PRODUCT_ID
