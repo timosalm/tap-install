@@ -263,19 +263,19 @@ dev-space      └─Pod/scan-tanzu-java-web-appmbg65-b8k9k          False    Po
 - If the `mvnw` executable in your workload's repository doesn't have executable permissions(`chmod +x mvnw`) the Tektok pipeline will fail with a `./mvnw: Permission denied` error. To fix this for all java Maven workloads, this is done in the `demo/tekton-pipeline.yaml`.
 
 ### Query for vulnerabilities
-[Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-scst-store-query_data.html)
+[Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-scst-store-query_data.html)
 Run the following command
 ```
 kubectl describe imagescans tanzu-java-web-app -n $DEVELOPER_NAMESPACE
 ```
-or query the metrics store with the insight CLI. [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-scst-store-query_data.html)
+or query the metrics store with the insight CLI. [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.1/tap/GUID-cli-plugins-insight-cli-overview.html)
 ```
 export METADATA_STORE_ACCESS_TOKEN=$(kubectl get secrets -n metadata-store -o jsonpath="{.items[?(@.metadata.annotations['kubernetes\.io/service-account\.name']=='metadata-store-read-write-client')].data.token}" | base64 -d)
 export INGRESS_DOMAIN=$(cat values.yaml | grep ingress -A 3 | awk '/domain:/ {print $2}')
 
-insight config set-target https://metadata-store.${INGRESS_DOMAIN} --access-token=$METADATA_STORE_ACCESS_TOKEN
+tanzu insight config set-target https://metadata-store.${INGRESS_DOMAIN} --access-token=$METADATA_STORE_ACCESS_TOKEN
 EXAMPLE_DIGEST=$(kubectl get kservice tanzu-java-web-app -n $DEVELOPER_NAMESPACE -o jsonpath='{.spec.template.spec.containers[0].image}' | awk -F @ '{ print $2 }')
-insight image get --digest $EXAMPLE_DIGEST --format json
-insight image packages --digest $EXAMPLE_DIGEST --format json
-insight image vulnerabilities --digest $EXAMPLE_DIGEST --format json
+tanzu insight image get --digest $EXAMPLE_DIGEST --format json
+tanzu insight image packages --digest $EXAMPLE_DIGEST --format json
+tanzu insight image vulnerabilities --digest $EXAMPLE_DIGEST --format json
 ```
