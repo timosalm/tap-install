@@ -95,6 +95,16 @@ az aks get-credentials --resource-group ${CLUSTER_NAME} --name ${CLUSTER_NAME}
 kubectl create clusterrolebinding tap-psp-rolebinding --group=system:authenticated --clusterrole=psp:privileged
 ```
 
+## Prepare values.yaml
+Copy values-example.yaml to values.yaml and set configuration values
+```
+cp values-example.yaml values.yaml
+```
+
+You have to create two private projects in Harbor with the names configured in `project` and `project_workload` of your values.yaml (default: **tap**, **tap-wkld**).
+For other registries you may have to change the format of the `kp_default_repository` and `ootb_supply_chain_testing_scanning.registry.repository` configuration values in `tap-values.yaml` 
+
+
 ## Install Cluster Essentials for VMware Tanzu
 
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install-general.html#tanzu-cluster-essentials)
@@ -142,14 +152,6 @@ rm -rf ~/.local/share/tanzu-cli/*
 ```
 ## Install TAP Full profile
 [Documentation](https://docs.vmware.com/en/Tanzu-Application-Platform/1.0/tap/GUID-install.html)
-
-Copy values-example.yaml to values.yaml and set configuration values
-```
-cp values-example.yaml values.yaml
-```
-
-You have to create two private projects in Harbor with the names configured in `project` and `project_workload` of your values.yaml (default: **tap**, **tap-wkld**).
-For other registries you may have to change the format of the `kp_default_repository` and `ootb_supply_chain_testing_scanning.registry.repository` configuration values in `tap-values.yaml` 
 
 Run the installation script.
 ```
