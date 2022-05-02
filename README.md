@@ -165,7 +165,11 @@ Run the installation script.
     tanzu package installed update tap --package-name tap.tanzu.vmware.com --version 1.1.0 --values-file generated/tap-values.yaml -n tap-install
     ```
 - You can get a list of all the installed TAP packages via `tanzu package installed list -n tap-install` or `kubectl get PackageInstall -n tap-install` and have closer look at one of the installed packages via `kubectl describe PackageInstall <package-name> -n tap-install`
-- Workaround to get a PackageInstallation reconcile immediately.
+- To get a PackageInstallation reconcile immediately, you can use the [kctrl CLI](https://carvel.dev/kapp-controller/docs/v0.36.1/package-command/)
+   ```
+   kctrl package installed kick -i <package-installation-name> -n tap-install
+   ```
+   or the following script
    ```
    function reconcile-packageinstall() {
            TAPNS=tap-install
