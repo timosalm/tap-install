@@ -14,7 +14,6 @@ apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-contour-cluster-issuer
-  namespace: tanzu-system-ingress
 spec:
   acme:
     email: #@ data.values.acme.email

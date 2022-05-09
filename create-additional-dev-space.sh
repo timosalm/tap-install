@@ -1,18 +1,54 @@
 #!/bin/bash
 
+set -e
+set -u
+set -o pipefail
+
 if [ -z "$1" ]
   then
     echo "No argument for the developer namespace supplied"
     exit 1
 fi
 
-kubectl create ns $1
-export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/hostname:/ {print $2}')
-export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/username:/ {print $2}')
-export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 5 | awk '/password:/ {print $2}')
-kubectl create secret docker-registry registry-credentials --docker-server=${CONTAINER_REGISTRY_HOSTNAME} --docker-username=${CONTAINER_REGISTRY_USERNAME} --docker-password=${CONTAINER_REGISTRY_PASSWORD} -n $1
+# base everything relative to the directory of this script file
+script_dir="$(cd $(dirname "$BASH_SOURCE[0]") && pwd)"
 
-cat <<EOF  | kubectl apply -n $1 -f -
+values_file_default="${script_dir}/values.yaml"
+values_file=${VALUES_FILE:-$values_file_default}
+
+DEVELOPER_NAMESPACE=${1}
+
+kapp deploy \
+  --app "tap-dev-ns-${DEVELOPER_NAMESPACE}" \
+  --namespace tap-install \
+  --file <(\
+    kubectl create namespace "${DEVELOPER_NAMESPACE}" \
+      --dry-run=client \
+      --output=yaml \
+      --save-config \
+    ) \
+  --yes
+
+export CONTAINER_REGISTRY_HOSTNAME=$(yq '.container_registry.hostname' < "${values_file}")
+export CONTAINER_REGISTRY_USERNAME=$(yq '.container_registry.username' < "${values_file}")
+export CONTAINER_REGISTRY_PASSWORD=$(yq '.container_registry.password' < "${values_file}")
+
+kapp deploy \
+  --app "tap-dev-ns-${DEVELOPER_NAMESPACE}-reg-creds" \
+  --namespace tap-install \
+  --file <(\
+    kubectl create secret docker-registry registry-credentials \
+      "--docker-server=${CONTAINER_REGISTRY_HOSTNAME}" \
+      "--docker-username=${CONTAINER_REGISTRY_USERNAME}" \
+      "--docker-password=${CONTAINER_REGISTRY_PASSWORD}" \
+      "--namespace=${DEVELOPER_NAMESPACE}" \
+      --dry-run=client \
+      --output=yaml \
+      --save-config \
+    ) \
+  --yes
+
+cat <<EOF | kapp deploy --yes --app "tap-dev-ns-${DEVELOPER_NAMESPACE}-auth" --namespace tap-install --into-ns "${DEVELOPER_NAMESPACE}" --file -
 apiVersion: v1
 kind: Secret
 metadata:
@@ -95,11 +131,12 @@ subjects:
   - kind: ServiceAccount
     name: default
 EOF
-cat <<EOF  | kubectl apply -n tap-install -f -
+
+cat <<EOF | kapp deploy --yes --app "tap-dev-ns-${DEVELOPER_NAMESPACE}-grype" --namespace tap-install --into-ns tap-install --file -
 apiVersion: packaging.carvel.dev/v1alpha1
 kind: PackageInstall
 metadata:
-  name: ${1}-grype
+  name: ${DEVELOPER_NAMESPACE}-grype
 spec:
   serviceAccountName: tap-install-sa
   packageRef:
@@ -110,16 +147,16 @@ spec:
         identifiers: [beta, build]
   values:
   - secretRef:
-      name: ${1}-grype-values
+      name: ${DEVELOPER_NAMESPACE}-grype-values
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: ${1}-grype-values
+  name: ${DEVELOPER_NAMESPACE}-grype-values
 stringData:
   values.yaml: |
     ---
-    namespace: ${1}
+    namespace: ${DEVELOPER_NAMESPACE}
     scanner:
       pullSecret: ""
     targetImagePullSecret: registry-credentials
