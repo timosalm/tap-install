@@ -17,6 +17,8 @@ export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(yq '.tanzunet.username' < "${values_file}")
 export INSTALL_REGISTRY_PASSWORD=$(yq '.tanzunet.password' < "${values_file}")
 
+ytt -f "${script_dir}/tas-adapter-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tas-adapter-values.yaml"
+
 kapp deploy \
   --app tas-adapter-certificates \
   --namespace tap-install \
@@ -26,17 +28,18 @@ kapp deploy \
   --yes
 
 tanzu package repository \
-  --namespace tas-adapter-install \
+  --namespace tap-install \
   add tas-adapter-repository \
   --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.5.0
 
-ytt -f "${script_dir}/tas-adapter-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tas-adapter-values.yaml"
 
+# swallow error on initial package installation because the schema validation will fail
 tanzu package install tas-adapter \
   --namespace tap-install \
   --package-name application-service-adapter.tanzu.vmware.com \
   --version 0.5.0 \
-  --values-file "${generated_dir}/tas-adapter-values.yaml"
+  --values-file "${generated_dir}/tas-adapter-values.yaml" \
+|| true
 
 # Due to a bug with the ordering of files in ytt version 0.38.0, the schema override doesn't work and we have to specify the full schema in the schema-overlay.yaml before the override as a workaround!
 kapp deploy \
@@ -58,6 +61,14 @@ kubectl annotate packageinstalls tas-adapter \
   --namespace tap-install \
   --overwrite \
   ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=tas-adapter-overlay-ingress
+
+kapp deploy \
+  --app tas-adapter-cf-admin \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/admin" \
+  ) \
+  --yes
 
 # Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect 
 # INGRESS_SECRET=$(cat values.yaml  | grep ingress -A 3 | awk '/contour_tls_secret:/ {print $2}')

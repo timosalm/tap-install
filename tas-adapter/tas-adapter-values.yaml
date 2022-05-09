@@ -13,8 +13,8 @@ app_ingress:
 app_registry_credentials:
     hostname: #@ data.values.container_registry.hostname
     username: #@ data.values.container_registry.username
-    password: #@ data.values.container_registry.password    
-kpack_image_tag_prefix: #@ "{}/tas-adapter-droplets".format(data.values.container_registry.hostname)
-package_registry_base_path: #@ "{}/tas-adapter-packages".format(data.values.container_registry.hostname)
+    password: #@ data.values.container_registry.password
+kpack_image_tag_prefix: #@ "{}/{}/droplets".format(data.values.container_registry.hostname,data.values.container_registry.project)
+package_registry_base_path: #@ "{}/{}/packages".format(data.values.container_registry.hostname,data.values.container_registry.project)
 contour_tls_secret: #@ data.values.ingress.contour_tls_secret
 contour_tls_namespace: #@ data.values.ingress.contour_tls_namespace

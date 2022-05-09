@@ -9,5 +9,8 @@ ingress:
   contour_tls_secret: contour-tls-delegation-cert
 container_registry:
   hostname: harbor.example.com
+  project: tas-adapter
   username: admin
   password: 
+admin:
+  username: user@example.com # Note: this is the name in the output of `cf curl /whoami`; see https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.5/tas-adapter/GUID-getting-started.html#assign-admin-user
