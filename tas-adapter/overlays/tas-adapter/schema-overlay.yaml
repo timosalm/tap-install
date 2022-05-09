@@ -2,22 +2,25 @@
 ---
 api_ingress:
   fqdn: ""
+  #@schema/nullable
+  port: 0
   tls:
     crt: ""
     key: ""
 kpack_cluster_builder_name: "default"
 kpack_image_tag_prefix: ""
 package_registry_base_path: ""
+app_registry_credentials:
+  username: ""
+  password: ""
+  hostname: ""
 
 app_ingress:
   default_domain: ""
   tls:
     crt: ""
     key: ""
-app_registry_credentials:
-  username: ""
-  password: ""
-  hostname: ""
+
 scaling:
   cf_k8s_api:
     limits:

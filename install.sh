@@ -58,7 +58,7 @@ tanzu package repository \
   --namespace tap-install \
   get tanzu-tap-repository
 
-ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
+ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
 
 kapp deploy \
   --app tap-overlay-cnrs-network \
