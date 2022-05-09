@@ -70,13 +70,13 @@ kapp deploy \
   ) \
   --yes
 
-# Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect 
-# INGRESS_SECRET=$(cat values.yaml  | grep ingress -A 3 | awk '/contour_tls_secret:/ {print $2}')
-# OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
-# until grep -q "$INGRESS_SECRET" <<< "$OVERRIDEN_CONFIG";
-# do
-#   echo "Waiting until config override happend ..."
-#   sleep 1
-#   OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
-# done
-# kubectl delete pods -l control-plane=controller-manager -n cf-k8s-controllers-system
+# Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect
+INGRESS_SECRET=$(yq '.ingress.contour_tls_secret' < "${values_file}")
+OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
+until grep -q "$INGRESS_SECRET" <<< "$OVERRIDEN_CONFIG";
+do
+  echo "Waiting until config override applied..."
+  sleep 1
+  OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
+done
+kubectl delete pods -l control-plane=controller-manager -n cf-k8s-controllers-system
