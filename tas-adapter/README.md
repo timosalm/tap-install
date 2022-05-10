@@ -1,11 +1,11 @@
-# Unofficial Application Service Adapter for VMware Tanzu Application Platform (0.4.0)
+# Unofficial Application Service Adapter for VMware Tanzu Application Platform (0.5.0)
 
 It's always recommended to go through the official documentation in addition to this guide!
 The scripts and commands in this guide were executed on a Amazon Linux 2 jumpbox. It's recommended to go through them step by step!
 
 ## Resources
  - [Public beta announcement](https://tanzu.vmware.com/content/blog/application-service-adapter-for-vmware-tanzu-application-platform-2)
- - [0.4.0 documentation](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.4/tas-adapter/GUID-overview.html)
+ - [0.5.0 documentation](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.5/tas-adapter/GUID-overview.html)
 
 ## Prerequisities
 - You have to create the following private projects in Harbor `tas-adapter-droplets`, `tas-adapter-packages`. For other registries you may have to change the format of the `kpack_image_tag_prefix` and `package_registry_base_path` configuration values in `tas-adapter-values.yaml`
@@ -56,4 +56,4 @@ cf delete-service # for user provided services
 cf get-health-check
 ```
 
-See the documentation for all supported CF CLI commands [here](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.4/tas-adapter/GUID-supported-cf-cli-commands.html)
+See the documentation for all supported CF CLI commands [here](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.5/tas-adapter/GUID-supported-cf-cli-commands.html)

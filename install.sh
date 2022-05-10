@@ -52,7 +52,7 @@ tanzu secret registry \
 tanzu package repository \
   --namespace tap-install \
   add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.0
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.1
 
 tanzu package repository \
   --namespace tap-install \
@@ -76,7 +76,7 @@ kapp deploy \
 tanzu package install tap \
   --namespace tap-install \
   --package-name tap.tanzu.vmware.com \
-  --version 1.1.0 \
+  --version 1.1.1 \
   --values-file "${generated_dir}/tap-values.yaml"
 
 # Use HTTPS instead of HTTP in the output of the application URL
