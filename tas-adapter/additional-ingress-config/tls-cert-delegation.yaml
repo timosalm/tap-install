@@ -1,0 +1,12 @@
+#@ load("@ytt:data", "data")
+---
+apiVersion: projectcontour.io/v1
+kind: TLSCertificateDelegation
+metadata:
+  name: contour-delegation-tas-adapter
+  namespace: #@ data.values.ingress.contour_tls_namespace
+spec:
+  delegations:
+  - secretName: #@ "tas-adapter-{}".format(data.values.ingress.contour_tls_secret)
+    targetNamespaces:
+    - "*"

@@ -1,125 +1,126 @@
 #!/bin/bash
 
-mkdir -p generated
+set -e
+set -u
+set -o pipefail
+
+# base everything relative to the directory of this script file
+script_dir="$(cd $(dirname "$BASH_SOURCE[0]") && pwd)"
+
+generated_dir="${script_dir}/generated"
+mkdir -p "${generated_dir}"
+
+values_file_default="${script_dir}/values.yaml"
+values_file=${VALUES_FILE:-$values_file_default}
 
 export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
-export INSTALL_REGISTRY_USERNAME=$(cat values.yaml | grep tanzunet -A 3 | awk '/username:/ {print $2}')
-export INSTALL_REGISTRY_PASSWORD=$(cat values.yaml  | grep tanzunet -A 3 | awk '/password:/ {print $2}')
+export INSTALL_REGISTRY_USERNAME=$(yq '.tanzunet.username' < "${values_file}")
+export INSTALL_REGISTRY_PASSWORD=$(yq '.tanzunet.password' < "${values_file}")
 
-kubectl create ns tap-install
-tanzu secret registry add tap-registry \
-  --username ${INSTALL_REGISTRY_USERNAME} --password ${INSTALL_REGISTRY_PASSWORD} \
-  --server ${INSTALL_REGISTRY_HOSTNAME} \
-  --export-to-all-namespaces --yes --namespace tap-install
-tanzu package repository add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.0 \
-  --namespace tap-install
-tanzu package repository get tanzu-tap-repository --namespace tap-install
+kapp deploy \
+  --app tap-install-ns \
+  --file <(\
+    kubectl create namespace tap-install \
+      --dry-run=client \
+      --output=yaml \
+      --save-config \
+    ) \
+  --yes
 
-ytt -f tap-values.yaml -f values.yaml --ignore-unknown-comments > generated/tap-values.yaml
+DEVELOPER_NAMESPACE=$(yq '.developer_namespace' < "${values_file}")
 
-DEVELOPER_NAMESPACE=$(cat values.yaml  | grep developer_namespace | awk '/developer_namespace:/ {print $2}')
-kubectl create ns $DEVELOPER_NAMESPACE
+kapp deploy \
+  --app "tap-dev-ns-${DEVELOPER_NAMESPACE}" \
+  --namespace tap-install \
+  --file <(\
+    kubectl create namespace "${DEVELOPER_NAMESPACE}" \
+      --dry-run=client \
+      --output=yaml \
+      --save-config \
+    ) \
+  --yes
 
-tanzu package install tap -p tap.tanzu.vmware.com -v 1.1.0 --values-file generated/tap-values.yaml -n tap-install
+tanzu secret registry \
+  --namespace tap-install \
+  add tap-registry \
+  --username "${INSTALL_REGISTRY_USERNAME}" \
+  --password "${INSTALL_REGISTRY_PASSWORD}" \
+  --server "${INSTALL_REGISTRY_HOSTNAME}" \
+  --export-to-all-namespaces \
+  --yes
+
+tanzu package repository \
+  --namespace tap-install \
+  add tanzu-tap-repository \
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.0
+
+tanzu package repository \
+  --namespace tap-install \
+  get tanzu-tap-repository
+
+ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
+
+kapp deploy \
+  --app tap-overlay-cnrs-network \
+  --namespace tap-install \
+  --file <(\
+    kubectl create secret generic tap-pkgi-overlay-0-cnrs-network-config \
+      --namespace tap-install \
+      --from-file="tap-pkgi-overlay-0-cnrs-network-config.yaml=${script_dir}/overlays/cnrs/tap-pkgi-overlay-0-cnrs-network-config.yaml" \
+      --dry-run=client \
+      --output=yaml \
+      --save-config \
+  ) \
+  --yes
+
+tanzu package install tap \
+  --namespace tap-install \
+  --package-name tap.tanzu.vmware.com \
+  --version 1.1.0 \
+  --values-file "${generated_dir}/tap-values.yaml"
 
 # Use HTTPS instead of HTTP in the output of the application URL
-kubectl create secret generic tap-pkgi-overlay-0-cnrs-network-config --from-file=tap-pkgi-overlay-0-cnrs-network-config.yaml=overlays/cnrs/tap-pkgi-overlay-0-cnrs-network-config.yaml -n tap-install
-kubectl annotate packageinstalls tap -n tap-install ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=tap-pkgi-overlay-0-cnrs-network-config
+kubectl annotate packageinstalls tap \
+  --namespace tap-install \
+  --overwrite \
+  ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=tap-pkgi-overlay-0-cnrs-network-config
 
 # install external dns
-kubectl create ns tanzu-system-ingress
-ytt --ignore-unknown-comments -f values.yaml -f ingress-config/ | kubectl apply -f-
+# check that the namespace set in .ingress.contour_tls_namespace already exists
+contour_tls_namespace=$(yq '.ingress.contour_tls_namespace' < "${values_file}")
+kubectl get namespace | cut -d' ' -f1 | grep -E "^${contour_tls_namespace}$" || exit 2
 
-# configure developer namespace
-export CONTAINER_REGISTRY_HOSTNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/hostname:/ {print $2}')
-export CONTAINER_REGISTRY_USERNAME=$(cat values.yaml | grep container_registry -A 5 | awk '/username:/ {print $2}')
-export CONTAINER_REGISTRY_PASSWORD=$(cat values.yaml | grep container_registry -A 5 | awk '/password:/ {print $2}')
-tanzu secret registry add registry-credentials --username ${CONTAINER_REGISTRY_USERNAME} --password ${CONTAINER_REGISTRY_PASSWORD} --server ${CONTAINER_REGISTRY_HOSTNAME} --namespace ${DEVELOPER_NAMESPACE}
+kapp deploy \
+  --app external-dns \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/external-dns \
+  ) \
+  --yes
 
-cat <<EOF | kubectl -n $DEVELOPER_NAMESPACE apply -f -
+kapp deploy \
+  --app lets-encrypt-issuer \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/lets-encrypt-issuer \
+  ) \
+  --yes
 
-apiVersion: v1
-kind: Secret
-metadata:
-  name: tap-registry
-  annotations:
-    secretgen.carvel.dev/image-pull-secret: ""
-type: kubernetes.io/dockerconfigjson
-data:
-  .dockerconfigjson: e30K
+kapp deploy \
+  --app certificates \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/certificates \
+  ) \
+  --yes
 
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: default
-secrets:
-  - name: registry-credentials
-imagePullSecrets:
-  - name: registry-credentials
-  - name: tap-registry
+kapp deploy \
+  --app ingress \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/ingress \
+  ) \
+  --yes
 
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: default
-rules:
-- apiGroups: [source.toolkit.fluxcd.io]
-  resources: [gitrepositories]
-  verbs: ['*']
-- apiGroups: [source.apps.tanzu.vmware.com]
-  resources: [imagerepositories]
-  verbs: ['*']
-- apiGroups: [carto.run]
-  resources: [deliverables, runnables]
-  verbs: ['*']
-- apiGroups: [kpack.io]
-  resources: [images]
-  verbs: ['*']
-- apiGroups: [conventions.apps.tanzu.vmware.com]
-  resources: [podintents]
-  verbs: ['*']
-- apiGroups: [""]
-  resources: ['configmaps']
-  verbs: ['*']
-- apiGroups: [""]
-  resources: ['pods']
-  verbs: ['list']
-- apiGroups: [tekton.dev]
-  resources: [taskruns, pipelineruns]
-  verbs: ['*']
-- apiGroups: [tekton.dev]
-  resources: [pipelines]
-  verbs: ['list']
-- apiGroups: [kappctrl.k14s.io]
-  resources: [apps]
-  verbs: ['*']
-- apiGroups: [serving.knative.dev]
-  resources: ['services']
-  verbs: ['*']
-- apiGroups: [servicebinding.io]
-  resources: ['servicebindings']
-  verbs: ['*']
-- apiGroups: [services.apps.tanzu.vmware.com]
-  resources: ['resourceclaims']
-  verbs: ['*']
-- apiGroups: [scanning.apps.tanzu.vmware.com]
-  resources: ['imagescans', 'sourcescans']
-  verbs: ['*']
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: default
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: default
-subjects:
-  - kind: ServiceAccount
-    name: default
-
-EOF
+# configure initial developer namespace
+"${script_dir}/create-additional-dev-space.sh" "$DEVELOPER_NAMESPACE"
