@@ -1,3 +1,4 @@
+.DS_Store
 generated/
 values.yaml
 tanzu-cluster-essentials/

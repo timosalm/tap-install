@@ -123,4 +123,4 @@ kapp deploy \
   --yes
 
 # configure initial developer namespace
-"${script_dir}/create-additional-dev-space.sh" "$DEVELOPER_NAMESPACE"
+"${script_dir}/configure-dev-space.sh" "$DEVELOPER_NAMESPACE"

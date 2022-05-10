@@ -65,6 +65,7 @@ cnrs:
   domain_template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
   default_tls_secret: #@ "{}/cnr-{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
 
-grype:
+grype: 
+  namespace: #@ data.values.developer_namespace
   targetImagePullSecret: registry-credentials
 
