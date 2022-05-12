@@ -77,7 +77,8 @@ tanzu package install tap \
   --namespace tap-install \
   --package-name tap.tanzu.vmware.com \
   --version 1.1.1 \
-  --values-file "${generated_dir}/tap-values.yaml"
+  --values-file "${generated_dir}/tap-values.yaml" \
+  --wait=false
 
 # Use HTTPS instead of HTTP in the output of the application URL
 kubectl annotate packageinstalls tap \

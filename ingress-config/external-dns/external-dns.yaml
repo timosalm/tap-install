@@ -67,6 +67,7 @@ spec:
         args:
         - --source=service
         - --source=ingress
+        - --source=contour-httpproxy
         - #@ "--domain-filter=" + str(data.values.ingress.domain)
         - --provider=aws
         - --aws-zone-type=public # Looks only at public hosted zones. Valid values are public, private, or no value for both.
