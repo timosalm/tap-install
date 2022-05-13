@@ -16,9 +16,14 @@ container_registry:
 developer_namespace: dev-space
 acme:
   email: user@example.com
+
+# Pick the provider you're looking to use for DNS and delete the others
 aws:
   region: eu-central-1
   credentials: # Note internal VMware users: CloudGate credentials will not have the necessary permissions to work
     accessKey: 
     secretKey: 
   route_fifty_three_zone_id:
+cloudflare:
+  credentials:
+    apiToken:

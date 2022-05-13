@@ -14,7 +14,7 @@ To also install the [Application Service Adapter for VMware Tanzu Application Pl
 
 ## Prerequisites 
 - [Pivnet CLI](https://github.com/pivotal-cf/pivnet-cli#installing)
-- A domain (configured in Route53)
+- A domain (configured in Route53 or Cloudflare)
 
 ## Provision a Kubernetes cluster
 

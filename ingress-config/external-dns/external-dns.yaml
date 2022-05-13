@@ -63,20 +63,24 @@ spec:
       serviceAccountName: external-dns
       containers:
       - name: external-dns
-        image: k8s.gcr.io/external-dns/external-dns:v0.9.0
+        image: k8s.gcr.io/external-dns/external-dns:v0.10.2
         args:
         - --source=service
         - --source=ingress
-        - --source=contour-httpproxy
         - #@ "--domain-filter=" + str(data.values.ingress.domain)
+        #@ if hasattr(data.values, "aws"):
         - --provider=aws
         - --aws-zone-type=public # Looks only at public hosted zones. Valid values are public, private, or no value for both.
         - --aws-prefer-cname
+        - #@ "--txt-owner-id=" + str(data.values.aws.route_fifty_three_zone_id)
+        #@ else:
+        - --provider=cloudflare
+        #@ end
         - --policy=upsert-only
-        - --txt-prefix=txt 
-        - #@ "--txt-owner-id=" + str(data.values.aws.route_fifty_three_zone_id)  
+        - --txt-prefix=txt   
         - --registry=txt
         env:
+         #@ if hasattr(data.values, "aws"):
          - name: AWS_ACCESS_KEY_ID
            valueFrom:
              secretKeyRef:
@@ -87,12 +91,27 @@ spec:
              secretKeyRef:
                name: route53-credentials
                key: aws_secret_access_key
+         #@ else:
+         - name: CF_API_TOKEN
+           valueFrom:
+             secretKeyRef:
+               name: cloudflare-credentials
+               key: cf_api_token
+         #@ end
 ---
 apiVersion: v1
 kind: Secret
 metadata:
+  #@ if hasattr(data.values, "aws"):
   name: route53-credentials
+  #@ else:
+  name: cloudflare-credentials
+  #@ end
   namespace: external-dns
 stringData:
+  #@ if hasattr(data.values, "aws"):
   aws_access_key_id: #@ data.values.aws.credentials.accessKey
   aws_secret_access_key: #@ data.values.aws.credentials.secretKey
+  #@ else:
+  cf_api_token: #@ data.values.cloudflare.credentials.apiToken
+  #@ end

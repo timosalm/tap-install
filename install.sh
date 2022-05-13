@@ -17,6 +17,8 @@ export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(yq '.tanzunet.username' < "${values_file}")
 export INSTALL_REGISTRY_PASSWORD=$(yq '.tanzunet.password' < "${values_file}")
 
+ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
+
 kapp deploy \
   --app tap-install-ns \
   --file <(\
@@ -57,8 +59,6 @@ tanzu package repository \
 tanzu package repository \
   --namespace tap-install \
   get tanzu-tap-repository
-
-ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
 
 kapp deploy \
   --app tap-overlay-cnrs-network \
