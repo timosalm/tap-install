@@ -56,4 +56,4 @@ cf delete-service # for user provided services
 cf get-health-check
 ```
 
-See the documentation for all supported CF CLI commands [here](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.4/tas-adapter/GUID-supported-cf-cli-commands.html)
+See the documentation for all supported CF CLI commands [here](https://docs.vmware.com/en/Application-Service-Adapter-for-VMware-Tanzu-Application-Platform/0.5/tas-adapter/GUID-supported-cf-cli-commands.html)
