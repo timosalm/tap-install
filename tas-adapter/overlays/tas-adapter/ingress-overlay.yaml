@@ -1,7 +1,7 @@
 #@ load("@ytt:overlay", "overlay")
 #@ load("@ytt:data", "data")
 
-#@overlay/match by=overlay.subset({"metadata":{"name":"cf-k8s-api-proxy"}, "kind": "HTTPProxy"})
+#@overlay/match by=overlay.subset({"metadata":{"name":"korifi-api-proxy"}, "kind": "HTTPProxy"})
 ---
 spec:
   virtualhost:

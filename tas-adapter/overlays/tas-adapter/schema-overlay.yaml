@@ -7,9 +7,17 @@ api_ingress:
   tls:
     crt: ""
     key: ""
+
+api_auth_proxy:
+  #@schema/nullable
+  host: ""
+  #@schema/nullable
+  ca_cert: ""
+
 kpack_cluster_builder_name: "default"
 kpack_image_tag_prefix: ""
 package_registry_base_path: ""
+
 app_registry_credentials:
   username: ""
   password: ""
@@ -22,7 +30,7 @@ app_ingress:
     key: ""
 
 scaling:
-  cf_k8s_api:
+  korifi_api:
     limits:
       #@schema/nullable
       cpu: ""
@@ -35,7 +43,7 @@ scaling:
       memory: ""
     #@schema/nullable
     replicas: 0
-  cf_k8s_controllers:
+  korifi_controllers:
     limits:
       #@schema/nullable
       cpu: ""
@@ -85,6 +93,13 @@ scaling:
       cpu: ""
       #@schema/nullable
       memory: ""
+  
+ceip_policy_disclosed: false #! Must be overridden to true by operator
+telemetry:
+  enabled: true
+  internal: false
+  heartbeat_interval: 24h
+
 #@data/values-schema
 ---
 #@overlay/match missing_ok=True
