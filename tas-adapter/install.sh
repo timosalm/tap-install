@@ -30,14 +30,14 @@ kapp deploy \
 tanzu package repository \
   --namespace tap-install \
   add tas-adapter-repository \
-  --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.5.0
+  --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.6.1
 
 
 # swallow error on initial package installation because the schema validation will fail
 tanzu package install tas-adapter \
   --namespace tap-install \
   --package-name application-service-adapter.tanzu.vmware.com \
-  --version 0.5.0 \
+  --version 0.6.1 \
   --values-file "${generated_dir}/tas-adapter-values.yaml" \
 || true
 

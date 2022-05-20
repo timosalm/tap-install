@@ -17,6 +17,8 @@ export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(yq '.tanzunet.username' < "${values_file}")
 export INSTALL_REGISTRY_PASSWORD=$(yq '.tanzunet.password' < "${values_file}")
 
+ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
+
 kapp deploy \
   --app tap-install-ns \
   --file <(\
@@ -52,13 +54,11 @@ tanzu secret registry \
 tanzu package repository \
   --namespace tap-install \
   add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.0
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.1
 
 tanzu package repository \
   --namespace tap-install \
   get tanzu-tap-repository
-
-ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
 
 kapp deploy \
   --app tap-overlay-cnrs-network \
@@ -76,8 +76,9 @@ kapp deploy \
 tanzu package install tap \
   --namespace tap-install \
   --package-name tap.tanzu.vmware.com \
-  --version 1.1.0 \
-  --values-file "${generated_dir}/tap-values.yaml"
+  --version 1.1.1 \
+  --values-file "${generated_dir}/tap-values.yaml" \
+  --wait=false
 
 # Use HTTPS instead of HTTP in the output of the application URL
 kubectl annotate packageinstalls tap \

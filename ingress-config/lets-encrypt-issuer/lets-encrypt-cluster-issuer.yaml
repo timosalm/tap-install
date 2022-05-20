@@ -3,11 +3,19 @@
 ---
 apiVersion: v1
 data:
+  #@ if hasattr(data.values, "aws"):
   secret-access-key: #@ base64.encode(data.values.aws.credentials.secretKey)
+  #@ else:
+  api-token: #@ base64.encode(data.values.cloudflare.credentials.apiToken)
+  #@ end
 kind: Secret
 metadata:
   creationTimestamp: null
+  #@ if hasattr(data.values, "aws"):
   name: prod-route53-credentials-secret
+  #@ else:
+  name: cloudflare-api-token-secret
+  #@ end
   namespace: cert-manager
 ---
 apiVersion: cert-manager.io/v1
@@ -22,6 +30,7 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
       - dns01:
+          #@ if hasattr(data.values, "aws"):
           route53:
             region: #@ data.values.aws.region
             hostedZoneID: #@ data.values.aws.route_fifty_three_zone_id
@@ -29,4 +38,10 @@ spec:
             secretAccessKeySecretRef:
               name: prod-route53-credentials-secret
               key: secret-access-key
+          #@ else:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token-secret
+              key: api-token
+          #@ end
 

@@ -3,12 +3,12 @@
 #@ load("@ytt:data", "data")
 
 #@ def updates():
-cfk8s_controller_namespace: #@ data.values.contour_tls_namespace
+korifi_controller_namespace: #@ data.values.contour_tls_namespace
 workloads_tls_secret_name: #@ "tas-adapter-{}".format(data.values.contour_tls_secret)
 #@ end
 
-#@overlay/match by=overlay.subset({"metadata":{"name":"cf-k8s-controllers-config"}, "kind": "ConfigMap"})
+#@overlay/match by=overlay.subset({"metadata":{"name":"korifi-controllers-config"}, "kind": "ConfigMap"})
 ---
 data:
   #@overlay/replace via=lambda a,_: yaml.encode(overlay.apply(yaml.decode(a), updates()))
-  cf_k8s_controllers_config.yaml:
+  korifi_controllers_config.yaml:
