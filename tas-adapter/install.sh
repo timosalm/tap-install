@@ -13,6 +13,8 @@ mkdir -p "${generated_dir}"
 values_file_default="${script_dir}/values.yaml"
 values_file=${VALUES_FILE:-$values_file_default}
 
+TAS_ADAPTER_VERSION=0.7.0
+
 export INSTALL_REGISTRY_HOSTNAME=registry.tanzu.vmware.com
 export INSTALL_REGISTRY_USERNAME=$(yq '.tanzunet.username' < "${values_file}")
 export INSTALL_REGISTRY_PASSWORD=$(yq '.tanzunet.password' < "${values_file}")
@@ -30,14 +32,14 @@ kapp deploy \
 tanzu package repository \
   --namespace tap-install \
   add tas-adapter-repository \
-  --url registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:0.5.0
+  --url "registry.tanzu.vmware.com/app-service-adapter/tas-adapter-package-repo:${TAS_ADAPTER_VERSION}"
 
 
 # swallow error on initial package installation because the schema validation will fail
 tanzu package install tas-adapter \
   --namespace tap-install \
   --package-name application-service-adapter.tanzu.vmware.com \
-  --version 0.5.0 \
+  --version "${TAS_ADAPTER_VERSION}" \
   --values-file "${generated_dir}/tas-adapter-values.yaml" \
 || true
 
@@ -70,13 +72,13 @@ kapp deploy \
   ) \
   --yes
 
-# Delete cf-k8s-controllers-controller-manager pod so that configuration changes take effect
+# Delete korifi-controllers-controller-manager pod so that configuration changes take effect
 INGRESS_SECRET=$(yq '.ingress.contour_tls_secret' < "${values_file}")
-OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
+OVERRIDEN_CONFIG=$(kubectl get cm -n korifi-controllers-system -o jsonpath='{.items[*].data}')
 until grep -q "$INGRESS_SECRET" <<< "$OVERRIDEN_CONFIG";
 do
   echo "Waiting until config override applied..."
   sleep 1
-  OVERRIDEN_CONFIG=$(kubectl get cm cf-k8s-controllers-config -n cf-k8s-controllers-system -o jsonpath='{.data}')
+  OVERRIDEN_CONFIG=$(kubectl get cm -n korifi-controllers-system -o jsonpath='{.items[*].data}')
 done
-kubectl delete pods -l control-plane=controller-manager -n cf-k8s-controllers-system
+kubectl delete pods -l control-plane=controller-manager -n korifi-controllers-system
