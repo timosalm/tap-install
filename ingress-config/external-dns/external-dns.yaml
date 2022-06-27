@@ -1,5 +1,15 @@
 #@ load("@ytt:data", "data")
 #@ load("@ytt:base64", "base64")
+#@ load("@ytt:json", "json")
+
+#@ def azure_external_dns_config():
+tenantId: #@ data.values.azure.tenant_id
+subscriptionId: #@ data.values.azure.subscription_id
+resourceGroup: #@ data.values.azure.resource_group
+aadClientId: #@ data.values.azure.credentials.aad_client_id
+aadClientSecret: #@ data.values.azure.credentials.aad_client_secret
+#@ end
+
 ---
 apiVersion: v1
 kind: Namespace
@@ -19,7 +29,7 @@ metadata:
   namespace: external-dns
 rules:
   - apiGroups: ['']
-    resources: ['endpoints', 'pods', 'services']
+    resources: ['endpoints', 'pods', 'services', 'nodes']
     verbs: ['get', 'watch', 'list']
   - apiGroups: ['extensions']
     resources: ['ingresses']
@@ -27,9 +37,6 @@ rules:
   - apiGroups: ["networking.k8s.io"]
     resources: ["ingresses"]
     verbs: ["get","watch","list"]
-  - apiGroups: [""]
-    resources: ["nodes"]
-    verbs: ["watch", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -63,35 +70,26 @@ spec:
       serviceAccountName: external-dns
       containers:
       - name: external-dns
-        image: k8s.gcr.io/external-dns/external-dns:v0.9.0
+        image: k8s.gcr.io/external-dns/external-dns:v0.11.0
         args:
         - --source=service
         - --source=ingress
         - #@ "--domain-filter=" + str(data.values.ingress.domain)
-        - --provider=aws
-        - --aws-zone-type=public # Looks only at public hosted zones. Valid values are public, private, or no value for both.
-        - --aws-prefer-cname
-        - --policy=upsert-only
-        - --txt-prefix=txt 
-        - #@ "--txt-owner-id=" + str(data.values.aws.route_fifty_three_zone_id)  
-        - --registry=txt
-        env:
-         - name: AWS_ACCESS_KEY_ID
-           valueFrom:
-             secretKeyRef:
-               name: route53-credentials
-               key: aws_access_key_id
-         - name: AWS_SECRET_ACCESS_KEY
-           valueFrom:
-             secretKeyRef:
-               name: route53-credentials
-               key: aws_secret_access_key
+        - --provider=azure
+        - #@ "--azure-resource-group=" + str(data.values.azure.resource_group)
+        volumeMounts:
+        - name: azure-config-file
+          mountPath: /etc/kubernetes
+          readOnly: true
+      volumes:
+      - name: azure-config-file
+        secret:
+          secretName: azure-config-file
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: route53-credentials
+  name: azure-config-file
   namespace: external-dns
 stringData:
-  aws_access_key_id: #@ data.values.aws.credentials.accessKey
-  aws_secret_access_key: #@ data.values.aws.credentials.secretKey
+  azure.json: #@ json.encode(azure_external_dns_config())

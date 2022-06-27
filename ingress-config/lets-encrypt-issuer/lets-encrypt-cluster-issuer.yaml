@@ -2,13 +2,13 @@
 #@ load("@ytt:base64", "base64")
 ---
 apiVersion: v1
-data:
-  secret-access-key: #@ base64.encode(data.values.aws.credentials.secretKey)
 kind: Secret
 metadata:
   creationTimestamp: null
-  name: prod-route53-credentials-secret
+  name: azure-dns-config
   namespace: cert-manager
+stringData:
+  clientSecret: #@ data.values.azure.credentials.aad_client_secret
 ---
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -22,11 +22,13 @@ spec:
     server: https://acme-v02.api.letsencrypt.org/directory
     solvers:
       - dns01:
-          route53:
-            region: #@ data.values.aws.region
-            hostedZoneID: #@ data.values.aws.route_fifty_three_zone_id
-            accessKeyID: #@ data.values.aws.credentials.accessKey
-            secretAccessKeySecretRef:
-              name: prod-route53-credentials-secret
-              key: secret-access-key
-
+          azureDNS:
+            clientID: #@ data.values.azure.credentials.aad_client_id
+            clientSecretSecretRef:
+              name: azure-dns-config
+              key: clientSecret
+            subscriptionID: #@ data.values.azure.subscription_id
+            tenantID: #@ data.values.azure.tenant_id
+            resourceGroupName: #@ data.values.azure.resource_group
+            hostedZoneName: #@ data.values.ingress.domain
+            environment: AzurePublicCloud
