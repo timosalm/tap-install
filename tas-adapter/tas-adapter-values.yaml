@@ -1,20 +1,21 @@
 #@ load("@ytt:data", "data")
 ---
+ceip_policy_disclosed: true
 api_ingress:
   fqdn: #@ "api-tas-adapter.{}".format(data.values.ingress.domain)
   tls:
-    crt: "PLACEHOLDER"
-    key: "PLACEHOLDER"
+    secret_name: #@ data.values.ingress.contour_tls_secret
+    namespace: #@ data.values.ingress.contour_tls_namespace
 app_ingress:
   default_domain:  #@ "tas-adapter.{}".format(data.values.ingress.domain)
   tls:
-    crt: "PLACEHOLDER"
-    key: "PLACEHOLDER"
-app_registry_credentials:
-    hostname: #@ data.values.container_registry.hostname
+    secret_name: #@ "tas-adapter-{}".format(data.values.ingress.contour_tls_secret)
+    namespace: #@ data.values.ingress.contour_tls_namespace
+app_registry:
+  credentials:
     username: #@ data.values.container_registry.username
     password: #@ data.values.container_registry.password
-kpack_image_tag_prefix: #@ "{}/{}/droplets".format(data.values.container_registry.hostname,data.values.container_registry.project)
-package_registry_base_path: #@ "{}/{}/packages".format(data.values.container_registry.hostname,data.values.container_registry.project)
-contour_tls_secret: #@ data.values.ingress.contour_tls_secret
-contour_tls_namespace: #@ data.values.ingress.contour_tls_namespace
+  hostname: #@ data.values.container_registry.hostname
+  path:
+    droplets: #@ "{}/{}/droplets".format(data.values.container_registry.hostname,data.values.container_registry.project)
+    packages: #@ "{}/{}/packages".format(data.values.container_registry.hostname,data.values.container_registry.project)
