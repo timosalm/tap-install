@@ -1,6 +1,9 @@
 #@ load("@ytt:data", "data")
 ---
 ceip_policy_disclosed: true
+admin:
+  users:
+  - #@ data.values.admin.username
 api_ingress:
   fqdn: #@ "api-tas-adapter.{}".format(data.values.ingress.domain)
   tls:
@@ -13,9 +16,10 @@ app_ingress:
     namespace: #@ data.values.ingress.contour_tls_namespace
 app_registry:
   credentials:
-    username: #@ data.values.container_registry.username
-    password: #@ data.values.container_registry.password
+    namespace: tap-install
+    secret_name: #@ data.values.container_registry.secret_name
   hostname: #@ data.values.container_registry.hostname
   path:
     droplets: #@ "{}/{}/droplets".format(data.values.container_registry.hostname,data.values.container_registry.project)
     packages: #@ "{}/{}/packages".format(data.values.container_registry.hostname,data.values.container_registry.project)
+kpack_clusterbuilder_name: full
