@@ -13,10 +13,18 @@ mkdir -p "${generated_dir}"
 values_file_default="${script_dir}/values.yaml"
 values_file=${VALUES_FILE:-$values_file_default}
 
-TAS_ADAPTER_PACKAGE_VERSION=0.9.0
+TAS_ADAPTER_PACKAGE_VERSION=1.0.0
 TAS_ADAPTER_REPO_VERSION="${TAS_ADAPTER_PACKAGE_VERSION}"
 
 ytt -f "${script_dir}/tas-adapter-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tas-adapter-values.yaml"
+
+kapp deploy \
+  --app tas-adapter-app-registry-credentials \
+  --namespace tap-install \
+  --file <(\
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/app-registry-credentials" \
+  ) \
+  --yes
 
 kapp deploy \
   --app tas-adapter-certificates \
@@ -37,11 +45,3 @@ tanzu package install tas-adapter \
   --package-name application-service-adapter.tanzu.vmware.com \
   --version "${TAS_ADAPTER_PACKAGE_VERSION}" \
   --values-file "${generated_dir}/tas-adapter-values.yaml"
-
-kapp deploy \
-  --app tas-adapter-cf-admin \
-  --namespace tap-install \
-  --file <(\
-     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/admin" \
-  ) \
-  --yes
