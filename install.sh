@@ -94,7 +94,7 @@ kapp deploy \
   --app external-dns \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/external-dns \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/external-dns" \
   ) \
   --yes
 
@@ -102,7 +102,7 @@ kapp deploy \
   --app lets-encrypt-issuer \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/lets-encrypt-issuer \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/lets-encrypt-issuer" \
   ) \
   --yes
 
@@ -110,7 +110,7 @@ kapp deploy \
   --app certificates \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/certificates \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/certificates" \
   ) \
   --yes
 
@@ -118,7 +118,7 @@ kapp deploy \
   --app ingress \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/ingress \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/ingress" \
   ) \
   --yes
 
