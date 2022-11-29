@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cnrs-network-config-overlay
+  annotations:
+    kapp.k14s.io/change-group: tap/package-overlays
+stringData:
+  cnrs-network-config-overlay.yaml: |
+    #@ load("@ytt:overlay", "overlay")
+    #@overlay/match by=overlay.subset({"metadata":{"name":"config-network"}, "kind": "ConfigMap"})
+    ---
+    data:
+      #@overlay/match missing_ok=True
+      default-external-scheme: https
+      #@overlay/match missing_ok=True
+      http-protocol: "Redirected"
+      #@overlay/match missing_ok=True
+      namespace-wildcard-cert-selector: '{"matchExpressions": [{"key":"networking.knative.dev/enableWildcardCert", "operator": "In", "values":["true"]}]}'
+      #@overlay/match missing_ok=True
+      auto-tls: Enabled

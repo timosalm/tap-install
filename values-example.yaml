@@ -14,6 +14,7 @@ container_registry:
   username: admin
   password: 
 developer_namespace: dev-space
+#! supply_chain: basic
 acme:
   email: user@example.com
 aws:
