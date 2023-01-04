@@ -13,7 +13,7 @@ mkdir -p "${generated_dir}"
 values_file_default="${script_dir}/values.yaml"
 values_file=${VALUES_FILE:-$values_file_default}
 
-TAS_ADAPTER_PACKAGE_VERSION=1.0.0
+TAS_ADAPTER_PACKAGE_VERSION=1.0.1
 TAS_ADAPTER_REPO_VERSION="${TAS_ADAPTER_PACKAGE_VERSION}"
 
 ytt -f "${script_dir}/tas-adapter-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tas-adapter-values.yaml"
