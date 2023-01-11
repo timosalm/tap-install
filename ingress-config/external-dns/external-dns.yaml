@@ -117,11 +117,14 @@ metadata:
   namespace: external-dns
 #@ if "aws" in data.values:
   name: route53-credentials
+#@ elif "azure" in data.values:
+  name: azure-config-file
+#@ end
+#@ if "aws" in data.values:
 stringData:
   aws_access_key_id: #@ data.values.aws.credentials.accessKey
   aws_secret_access_key: #@ data.values.aws.credentials.secretKey
 #@ elif "azure" in data.values:
-  name: azure-config-file
 stringData:
   azure.json: #@ json.encode(azure_external_dns_config())
 #@ end
