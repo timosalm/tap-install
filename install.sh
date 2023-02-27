@@ -52,7 +52,7 @@ tanzu secret registry \
 tanzu package repository \
   --namespace tap-install \
   add tanzu-tap-repository \
-  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.1.0
+  --url registry.tanzu.vmware.com/tanzu-application-platform/tap-packages:1.3.2
 
 tanzu package repository \
   --namespace tap-install \
@@ -61,29 +61,27 @@ tanzu package repository \
 ytt -f "${script_dir}/tap-values.yaml" -f "${values_file}" --ignore-unknown-comments > "${generated_dir}/tap-values.yaml"
 
 kapp deploy \
-  --app tap-overlay-cnrs-network \
+  --app tap-overlay-cnrs \
   --namespace tap-install \
-  --file <(\
-    kubectl create secret generic tap-pkgi-overlay-0-cnrs-network-config \
-      --namespace tap-install \
-      --from-file="tap-pkgi-overlay-0-cnrs-network-config.yaml=${script_dir}/overlays/cnrs/tap-pkgi-overlay-0-cnrs-network-config.yaml" \
-      --dry-run=client \
-      --output=yaml \
-      --save-config \
-  ) \
+  --file "${script_dir}/overlays/cnrs" \
   --yes
 
 tanzu package install tap \
   --namespace tap-install \
   --package-name tap.tanzu.vmware.com \
-  --version 1.1.0 \
+  --version 1.3.2 \
   --values-file "${generated_dir}/tap-values.yaml"
 
-# Use HTTPS instead of HTTP in the output of the application URL
-kubectl annotate packageinstalls tap \
+tanzu package repository \
   --namespace tap-install \
-  --overwrite \
-  ext.packaging.carvel.dev/ytt-paths-from-secret-name.0=tap-pkgi-overlay-0-cnrs-network-config
+  add tanzu-full-tbs-deps-repository \
+  --url registry.tanzu.vmware.com/tanzu-application-platform/full-tbs-deps-package-repo:1.7.4
+
+tanzu package install tbs-full-dependencies \
+  --namespace tap-install \
+  --package-name full-tbs-deps.tanzu.vmware.com \
+  --version 1.7.4
+
 
 # install external dns
 # check that the namespace set in .ingress.contour_tls_namespace already exists
@@ -94,7 +92,7 @@ kapp deploy \
   --app external-dns \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/external-dns \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/external-dns" \
   ) \
   --yes
 
@@ -102,7 +100,7 @@ kapp deploy \
   --app lets-encrypt-issuer \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/lets-encrypt-issuer \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/lets-encrypt-issuer" \
   ) \
   --yes
 
@@ -110,7 +108,7 @@ kapp deploy \
   --app certificates \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/certificates \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/certificates" \
   ) \
   --yes
 
@@ -118,7 +116,7 @@ kapp deploy \
   --app ingress \
   --namespace tap-install \
   --file <(\
-     ytt --ignore-unknown-comments -f values.yaml -f ${script_dir}/ingress-config/ingress \
+     ytt --ignore-unknown-comments -f "${values_file}" -f "${script_dir}/ingress-config/ingress" \
   ) \
   --yes
 

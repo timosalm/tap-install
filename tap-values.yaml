@@ -2,16 +2,44 @@
 ---
 profile: full
 ceip_policy_disclosed: true # Installation fails if this is set to 'false'
+
+excluded_packages:
+- policy.apps.tanzu.vmware.com
+
+shared:
+  ingress_domain: #@ data.values.ingress.domain
+
+accelerator:
+  domain: #@ data.values.ingress.domain
+  ingress:
+    include: true
+  server:
+    service_type: ClusterIP
+  tls:
+    namespace: #@ data.values.ingress.contour_tls_namespace
+    secret_name: #@ data.values.ingress.contour_tls_secret
+
+appliveview:
+  tls:
+    namespace: #@ data.values.ingress.contour_tls_namespace
+    secretName: #@ data.values.ingress.contour_tls_secret
+
 buildservice:
   kp_default_repository: #@ "{}/{}/build-service".format(data.values.container_registry.hostname,data.values.container_registry.project)
   kp_default_repository_username: #@ data.values.container_registry.username
   kp_default_repository_password: #@ data.values.container_registry.password
   tanzunet_username: #@ data.values.tanzunet.username
   tanzunet_password: #@ data.values.tanzunet.password
-  enable_automatic_dependency_updates: true
-  descriptor_name: full
+  exclude_dependencies: true
 
-supply_chain: testing_scanning
+supply_chain: #@ data.values.supply_chain if "supply_chain" in data.values else "testing_scanning"
+
+ootb_supply_chain_basic:
+  registry:
+    server: #@ data.values.container_registry.hostname
+    repository: #@ data.values.container_registry.project_workload
+  gitops:
+    ssh_secret: ""
 
 ootb_supply_chain_testing_scanning:
   registry:
@@ -30,7 +58,7 @@ tap_gui:
   ingressDomain: #@ data.values.ingress.domain
   service_type: ClusterIP # NodePort for distributions that don't support LoadBalancer
   tls:
-    secretName: #@ data.values.ingress.contour_tls_secret                                                 
+    secretName: #@ data.values.ingress.contour_tls_secret
     namespace: #@ data.values.ingress.contour_tls_namespace
   app_config:
     backend:
@@ -43,6 +71,10 @@ tap_gui:
 metadata_store:
   app_service_type: ClusterIP # (optional) Defaults to LoadBalancer. Change to NodePort for distributions that don't support LoadBalancer
 
+grype:
+  namespace: #@ data.values.developer_namespace
+  targetImagePullSecret: registry-credentials
+
 contour:
   envoy:
     service:
@@ -50,22 +82,13 @@ contour:
         external-dns.alpha.kubernetes.io/hostname: #@ "*.{}".format(data.values.ingress.domain)
       type: LoadBalancer
 
-accelerator: 
-  domain: #@ "{}".format(data.values.ingress.domain)                         
-  ingress:
-    include: true
-  tls:
-    secretName: #@ data.values.ingress.contour_tls_secret                                                 
-    namespace: #@ data.values.ingress.contour_tls_namespace
-  server:
-    service_type: ClusterIP
-
 cnrs:
   domain_name: #@ "cnr.{}".format(data.values.ingress.domain)
   domain_template: "{{.Name}}-{{.Namespace}}.{{.Domain}}"
   default_tls_secret: #@ "{}/cnr-{}".format(data.values.ingress.contour_tls_namespace,data.values.ingress.contour_tls_secret)
 
-grype: 
-  namespace: #@ data.values.developer_namespace
-  targetImagePullSecret: registry-credentials
-
+package_overlays:
+- name: cnrs
+  secrets:
+  - name: cnrs-network-config-overlay
+  - name: cnrs-certmanager-config-overlay
